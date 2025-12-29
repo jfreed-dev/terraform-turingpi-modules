@@ -30,3 +30,13 @@ output "kubeconfig_path" {
   description = "Path to kubeconfig file (if written)"
   value       = var.kubeconfig_path != null ? var.kubeconfig_path : null
 }
+
+output "nvme_enabled" {
+  description = "Whether NVMe storage is configured"
+  value       = var.nvme_storage_enabled
+}
+
+output "nvme_mountpoint" {
+  description = "NVMe mount point (if enabled)"
+  value       = var.nvme_storage_enabled ? var.nvme_mountpoint : null
+}

@@ -1,3 +1,32 @@
+# Generate NVMe config patch if enabled
+locals {
+  nvme_config_patch = var.nvme_storage_enabled ? yamlencode({
+    machine = {
+      disks = [
+        {
+          device = var.nvme_device
+          partitions = [
+            {
+              mountpoint = var.nvme_mountpoint
+            }
+          ]
+        }
+      ]
+    }
+  }) : null
+
+  # Combine user patches with NVMe patch
+  controlplane_patches_combined = var.nvme_storage_enabled && var.nvme_control_plane ? concat(
+    var.controlplane_patches,
+    [local.nvme_config_patch]
+  ) : var.controlplane_patches
+
+  worker_patches_combined = var.nvme_storage_enabled ? concat(
+    var.worker_patches,
+    [local.nvme_config_patch]
+  ) : var.worker_patches
+}
+
 # Generate machine secrets (PKI)
 resource "talos_machine_secrets" "this" {}
 
@@ -7,7 +36,7 @@ data "talos_machine_configuration" "controlplane" {
   cluster_endpoint = var.cluster_endpoint
   machine_type     = "controlplane"
   machine_secrets  = talos_machine_secrets.this.machine_secrets
-  config_patches   = var.controlplane_patches
+  config_patches   = local.controlplane_patches_combined
 }
 
 # Generate worker machine configuration
@@ -18,7 +47,7 @@ data "talos_machine_configuration" "worker" {
   cluster_endpoint = var.cluster_endpoint
   machine_type     = "worker"
   machine_secrets  = talos_machine_secrets.this.machine_secrets
-  config_patches   = var.worker_patches
+  config_patches   = local.worker_patches_combined
 }
 
 # Apply configuration to control plane nodes

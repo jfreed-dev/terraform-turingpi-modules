@@ -58,3 +58,28 @@ variable "allow_scheduling_on_control_plane" {
   type        = bool
   default     = true
 }
+
+# NVMe Storage Configuration
+variable "nvme_storage_enabled" {
+  description = "Enable NVMe storage configuration for Longhorn"
+  type        = bool
+  default     = false
+}
+
+variable "nvme_device" {
+  description = "NVMe device path"
+  type        = string
+  default     = "/dev/nvme0n1"
+}
+
+variable "nvme_mountpoint" {
+  description = "Mount point for NVMe storage"
+  type        = string
+  default     = "/var/mnt/longhorn"
+}
+
+variable "nvme_control_plane" {
+  description = "Configure NVMe on control plane nodes (in addition to workers)"
+  type        = bool
+  default     = true
+}
