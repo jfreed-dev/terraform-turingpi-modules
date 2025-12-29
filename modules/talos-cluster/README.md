@@ -7,7 +7,7 @@ Terraform module to deploy a Talos Kubernetes cluster on Turing Pi 2.5 nodes usi
 ```hcl
 module "cluster" {
   source  = "jfreed-dev/talos-cluster/turingpi"
-  version = "1.0.0"
+  version = ">= 1.0.0"
 
   cluster_name     = "my-cluster"
   cluster_endpoint = "https://192.168.1.101:6443"

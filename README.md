@@ -17,7 +17,7 @@ Reusable Terraform modules for Turing Pi cluster provisioning and management.
 # Flash Talos to nodes
 module "flash" {
   source  = "jfreed-dev/modules/turingpi//modules/flash-nodes"
-  version = "1.0.2"
+  version = ">= 1.0.0"
 
   nodes = {
     1 = { firmware = "talos-rk1-v1.9.1.raw.xz" }

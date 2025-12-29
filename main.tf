@@ -12,13 +12,13 @@
 # Usage:
 #   module "flash" {
 #     source  = "jfreed-dev/modules/turingpi//modules/flash-nodes"
-#     version = "1.0.2"
+#     version = ">= 1.0.0"
 #     nodes = { 1 = { firmware = "talos.raw" } }
 #   }
 #
 #   module "cluster" {
 #     source  = "jfreed-dev/modules/turingpi//modules/talos-cluster"
-#     version = "1.0.2"
+#     version = ">= 1.0.0"
 #     cluster_name     = "my-cluster"
 #     cluster_endpoint = "https://192.168.1.101:6443"
 #     control_plane    = [{ host = "192.168.1.101" }]

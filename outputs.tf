@@ -16,7 +16,7 @@ output "usage_example" {
   value       = <<-EOT
     module "cluster" {
       source  = "jfreed-dev/modules/turingpi//modules/talos-cluster"
-      version = "1.0.2"
+      version = ">= 1.0.0"
       # ... configuration
     }
   EOT
