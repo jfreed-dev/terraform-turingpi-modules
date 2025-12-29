@@ -16,3 +16,9 @@ metallb_ip_range = "192.168.1.200-192.168.1.220"
 
 # Ingress controller IP (should be within MetalLB range)
 ingress_ip = "192.168.1.200"
+
+# Portainer agent IP
+portainer_ip = "192.168.1.201"
+
+# Grafana admin password (change this!)
+grafana_password = "your-secure-password"

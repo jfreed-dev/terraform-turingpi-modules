@@ -50,3 +50,15 @@ variable "ingress_ip" {
   description = "IP address for ingress controller"
   type        = string
 }
+
+variable "portainer_ip" {
+  description = "IP address for Portainer agent"
+  type        = string
+}
+
+variable "grafana_password" {
+  description = "Grafana admin password"
+  type        = string
+  sensitive   = true
+  default     = "admin"
+}

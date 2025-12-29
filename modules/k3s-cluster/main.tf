@@ -1,0 +1,369 @@
+# Generate cluster token if not provided
+resource "random_password" "cluster_token" {
+  count   = var.cluster_token == "" ? 1 : 0
+  length  = 64
+  special = false
+}
+
+locals {
+  cluster_token = var.cluster_token != "" ? var.cluster_token : random_password.cluster_token[0].result
+  api_endpoint  = "https://${var.control_plane.host}:6443"
+
+  # Build K3s server install arguments
+  k3s_server_args = compact(concat(
+    var.disable_traefik ? ["--disable=traefik"] : [],
+    var.disable_servicelb ? ["--disable=servicelb"] : [],
+    var.disable_local_storage ? ["--disable=local-storage"] : [],
+    var.flannel_backend != "vxlan" ? ["--flannel-backend=${var.flannel_backend}"] : [],
+    var.cluster_cidr != "10.42.0.0/16" ? ["--cluster-cidr=${var.cluster_cidr}"] : [],
+    var.service_cidr != "10.43.0.0/16" ? ["--service-cidr=${var.service_cidr}"] : [],
+    var.cluster_dns != "10.43.0.10" ? ["--cluster-dns=${var.cluster_dns}"] : [],
+    ["--write-kubeconfig-mode=644"],
+    var.extra_server_args
+  ))
+
+  k3s_server_args_str = join(" ", local.k3s_server_args)
+  k3s_agent_args_str  = join(" ", var.extra_agent_args)
+}
+
+# =============================================================================
+# Control Plane Installation
+# =============================================================================
+
+# Prepare and install K3s on control plane
+resource "null_resource" "k3s_control_plane" {
+  triggers = {
+    host         = var.control_plane.host
+    k3s_version  = var.k3s_version
+    server_args  = local.k3s_server_args_str
+    nvme_enabled = var.nvme_storage_enabled
+  }
+
+  connection {
+    type        = "ssh"
+    host        = var.control_plane.host
+    user        = var.control_plane.ssh_user
+    private_key = var.control_plane.ssh_key
+    password    = var.control_plane.ssh_password
+    port        = var.control_plane.ssh_port
+    timeout     = "5m"
+  }
+
+  # Install packages
+  provisioner "remote-exec" {
+    inline = [
+      "#!/bin/bash",
+      "set -e",
+      "export DEBIAN_FRONTEND=noninteractive",
+      "",
+      "echo '=== Installing required packages ==='",
+      "apt-get update -qq",
+      var.install_open_iscsi ? "apt-get install -y -qq open-iscsi && systemctl enable --now iscsid" : "echo 'Skipping open-iscsi'",
+      var.install_nfs_common ? "apt-get install -y -qq nfs-common" : "echo 'Skipping nfs-common'",
+      "apt-get install -y -qq curl parted",
+    ]
+  }
+
+  # Configure NVMe (if enabled)
+  provisioner "remote-exec" {
+    inline = var.nvme_storage_enabled && var.nvme_control_plane ? [
+      "#!/bin/bash",
+      "set -e",
+      "",
+      "echo '=== Configuring NVMe storage ==='",
+      "",
+      "# Check if device exists",
+      "if [ ! -b ${var.nvme_device} ]; then",
+      "  echo 'NVMe device ${var.nvme_device} not found, skipping'",
+      "  exit 0",
+      "fi",
+      "",
+      "# Check if already mounted",
+      "if mountpoint -q ${var.nvme_mountpoint} 2>/dev/null; then",
+      "  echo 'NVMe already mounted at ${var.nvme_mountpoint}'",
+      "  exit 0",
+      "fi",
+      "",
+      "# Create partition if needed",
+      "if [ ! -b ${var.nvme_device}p1 ]; then",
+      "  echo 'Creating partition on ${var.nvme_device}'",
+      "  parted -s ${var.nvme_device} mklabel gpt",
+      "  parted -s ${var.nvme_device} mkpart primary ${var.nvme_filesystem} 0% 100%",
+      "  sleep 2",
+      "  partprobe ${var.nvme_device}",
+      "fi",
+      "",
+      "# Format if needed",
+      "if ! blkid ${var.nvme_device}p1 2>/dev/null | grep -q 'TYPE='; then",
+      "  echo 'Formatting ${var.nvme_device}p1 as ${var.nvme_filesystem}'",
+      "  mkfs.${var.nvme_filesystem} ${var.nvme_device}p1",
+      "fi",
+      "",
+      "# Mount",
+      "mkdir -p ${var.nvme_mountpoint}",
+      "mount ${var.nvme_device}p1 ${var.nvme_mountpoint}",
+      "",
+      "# Add to fstab",
+      "if ! grep -q '${var.nvme_device}p1' /etc/fstab; then",
+      "  echo '${var.nvme_device}p1 ${var.nvme_mountpoint} ${var.nvme_filesystem} defaults,nofail 0 2' >> /etc/fstab",
+      "fi",
+      "",
+      "echo 'NVMe configured at ${var.nvme_mountpoint}'"
+    ] : ["echo 'NVMe not enabled for control plane'"]
+  }
+
+  # Install K3s server
+  provisioner "remote-exec" {
+    inline = [
+      "#!/bin/bash",
+      "set -e",
+      "",
+      "echo '=== Installing K3s server ==='",
+      "",
+      "# Disable swap",
+      "swapoff -a || true",
+      "sed -i '/swap/d' /etc/fstab 2>/dev/null || true",
+      "",
+      "# Check if K3s is already installed and running",
+      "if systemctl is-active --quiet k3s 2>/dev/null; then",
+      "  echo 'K3s server already running'",
+      "  kubectl get nodes",
+      "  exit 0",
+      "fi",
+      "",
+      "# Install K3s",
+      "echo 'Installing K3s ${var.k3s_version != "" ? var.k3s_version : "latest"}...'",
+      "curl -sfL https://get.k3s.io | ${var.k3s_version != "" ? "INSTALL_K3S_VERSION='${var.k3s_version}'" : ""} K3S_TOKEN='${local.cluster_token}' sh -s - server ${local.k3s_server_args_str}",
+      "",
+      "# Wait for K3s to be ready",
+      "echo 'Waiting for K3s to be ready...'",
+      "for i in $(seq 1 60); do",
+      "  if kubectl get nodes 2>/dev/null | grep -q ' Ready'; then",
+      "    echo 'K3s server is ready!'",
+      "    kubectl get nodes",
+      "    exit 0",
+      "  fi",
+      "  echo \"Waiting... ($i/60)\"",
+      "  sleep 5",
+      "done",
+      "echo 'ERROR: Timeout waiting for K3s'",
+      "exit 1"
+    ]
+  }
+}
+
+# =============================================================================
+# Worker Installation
+# =============================================================================
+
+# Prepare and install K3s agent on workers
+resource "null_resource" "k3s_workers" {
+  for_each = { for idx, worker in var.workers : idx => worker }
+
+  depends_on = [null_resource.k3s_control_plane]
+
+  triggers = {
+    host         = each.value.host
+    k3s_version  = var.k3s_version
+    server_host  = var.control_plane.host
+    nvme_enabled = var.nvme_storage_enabled
+  }
+
+  connection {
+    type        = "ssh"
+    host        = each.value.host
+    user        = each.value.ssh_user
+    private_key = each.value.ssh_key
+    password    = each.value.ssh_password
+    port        = each.value.ssh_port
+    timeout     = "5m"
+  }
+
+  # Install packages
+  provisioner "remote-exec" {
+    inline = [
+      "#!/bin/bash",
+      "set -e",
+      "export DEBIAN_FRONTEND=noninteractive",
+      "",
+      "echo '=== Installing required packages on worker ${each.key} ==='",
+      "apt-get update -qq",
+      var.install_open_iscsi ? "apt-get install -y -qq open-iscsi && systemctl enable --now iscsid" : "echo 'Skipping open-iscsi'",
+      var.install_nfs_common ? "apt-get install -y -qq nfs-common" : "echo 'Skipping nfs-common'",
+      "apt-get install -y -qq curl parted",
+    ]
+  }
+
+  # Configure NVMe (if enabled)
+  provisioner "remote-exec" {
+    inline = var.nvme_storage_enabled ? [
+      "#!/bin/bash",
+      "set -e",
+      "",
+      "echo '=== Configuring NVMe storage on worker ${each.key} ==='",
+      "",
+      "if [ ! -b ${var.nvme_device} ]; then",
+      "  echo 'NVMe device ${var.nvme_device} not found, skipping'",
+      "  exit 0",
+      "fi",
+      "",
+      "if mountpoint -q ${var.nvme_mountpoint} 2>/dev/null; then",
+      "  echo 'NVMe already mounted at ${var.nvme_mountpoint}'",
+      "  exit 0",
+      "fi",
+      "",
+      "if [ ! -b ${var.nvme_device}p1 ]; then",
+      "  echo 'Creating partition on ${var.nvme_device}'",
+      "  parted -s ${var.nvme_device} mklabel gpt",
+      "  parted -s ${var.nvme_device} mkpart primary ${var.nvme_filesystem} 0% 100%",
+      "  sleep 2",
+      "  partprobe ${var.nvme_device}",
+      "fi",
+      "",
+      "if ! blkid ${var.nvme_device}p1 2>/dev/null | grep -q 'TYPE='; then",
+      "  echo 'Formatting ${var.nvme_device}p1 as ${var.nvme_filesystem}'",
+      "  mkfs.${var.nvme_filesystem} ${var.nvme_device}p1",
+      "fi",
+      "",
+      "mkdir -p ${var.nvme_mountpoint}",
+      "mount ${var.nvme_device}p1 ${var.nvme_mountpoint}",
+      "",
+      "if ! grep -q '${var.nvme_device}p1' /etc/fstab; then",
+      "  echo '${var.nvme_device}p1 ${var.nvme_mountpoint} ${var.nvme_filesystem} defaults,nofail 0 2' >> /etc/fstab",
+      "fi",
+      "",
+      "echo 'NVMe configured on worker ${each.key}'"
+    ] : ["echo 'NVMe not enabled'"]
+  }
+
+  # Install K3s agent
+  provisioner "remote-exec" {
+    inline = [
+      "#!/bin/bash",
+      "set -e",
+      "",
+      "echo '=== Installing K3s agent on worker ${each.key} ==='",
+      "",
+      "# Disable swap",
+      "swapoff -a || true",
+      "sed -i '/swap/d' /etc/fstab 2>/dev/null || true",
+      "",
+      "# Check if K3s agent is already installed",
+      "if systemctl is-active --quiet k3s-agent 2>/dev/null; then",
+      "  echo 'K3s agent already running'",
+      "  exit 0",
+      "fi",
+      "",
+      "# Install K3s agent",
+      "echo 'Installing K3s agent...'",
+      "curl -sfL https://get.k3s.io | ${var.k3s_version != "" ? "INSTALL_K3S_VERSION='${var.k3s_version}'" : ""} K3S_URL='https://${var.control_plane.host}:6443' K3S_TOKEN='${local.cluster_token}' sh -s - agent ${local.k3s_agent_args_str}",
+      "",
+      "echo 'K3s agent installed on worker ${each.key}'"
+    ]
+  }
+}
+
+# Wait for all workers to be ready
+resource "null_resource" "wait_for_cluster" {
+  count = length(var.workers) > 0 ? 1 : 0
+
+  depends_on = [null_resource.k3s_workers]
+
+  triggers = {
+    worker_count = length(var.workers)
+  }
+
+  connection {
+    type        = "ssh"
+    host        = var.control_plane.host
+    user        = var.control_plane.ssh_user
+    private_key = var.control_plane.ssh_key
+    password    = var.control_plane.ssh_password
+    port        = var.control_plane.ssh_port
+    timeout     = "5m"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "#!/bin/bash",
+      "",
+      "echo '=== Waiting for all ${length(var.workers) + 1} nodes to be ready ==='",
+      "EXPECTED=$((1 + ${length(var.workers)}))",
+      "",
+      "for i in $(seq 1 60); do",
+      "  READY=$(kubectl get nodes --no-headers 2>/dev/null | grep -c ' Ready' || echo 0)",
+      "  echo \"Ready nodes: $READY / $EXPECTED (attempt $i/60)\"",
+      "  if [ \"$READY\" -ge \"$EXPECTED\" ]; then",
+      "    echo ''",
+      "    echo 'All nodes are ready!'",
+      "    kubectl get nodes -o wide",
+      "    exit 0",
+      "  fi",
+      "  sleep 5",
+      "done",
+      "",
+      "echo 'Warning: Timeout waiting for all nodes'",
+      "kubectl get nodes -o wide",
+      "exit 0"
+    ]
+  }
+}
+
+# =============================================================================
+# Kubeconfig Management
+# =============================================================================
+
+# Fetch kubeconfig from control plane
+resource "null_resource" "fetch_kubeconfig" {
+  depends_on = [
+    null_resource.k3s_control_plane,
+    null_resource.wait_for_cluster
+  ]
+
+  triggers = {
+    control_plane_id = null_resource.k3s_control_plane.id
+  }
+
+  connection {
+    type        = "ssh"
+    host        = var.control_plane.host
+    user        = var.control_plane.ssh_user
+    private_key = var.control_plane.ssh_key
+    password    = var.control_plane.ssh_password
+    port        = var.control_plane.ssh_port
+    timeout     = "2m"
+  }
+
+  # Copy kubeconfig and modify server address
+  provisioner "remote-exec" {
+    inline = [
+      "cat /etc/rancher/k3s/k3s.yaml | sed 's/127.0.0.1/${var.control_plane.host}/g' | sed 's/localhost/${var.control_plane.host}/g' > /tmp/kubeconfig-external.yaml",
+      "cat /var/lib/rancher/k3s/server/node-token > /tmp/node-token.txt"
+    ]
+  }
+
+  # Fetch kubeconfig to local
+  provisioner "local-exec" {
+    command = <<-EOT
+      scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+        -P ${var.control_plane.ssh_port} \
+        ${var.control_plane.ssh_user}@${var.control_plane.host}:/tmp/kubeconfig-external.yaml \
+        ${path.module}/.kubeconfig.tmp
+    EOT
+  }
+}
+
+# Read kubeconfig
+data "local_file" "kubeconfig" {
+  depends_on = [null_resource.fetch_kubeconfig]
+  filename   = "${path.module}/.kubeconfig.tmp"
+}
+
+# Write kubeconfig to specified path if provided
+resource "local_file" "kubeconfig" {
+  count           = var.kubeconfig_path != null ? 1 : 0
+  depends_on      = [data.local_file.kubeconfig]
+  content         = data.local_file.kubeconfig.content
+  filename        = var.kubeconfig_path
+  file_permission = "0600"
+}

@@ -1,0 +1,23 @@
+# K3s Full Stack Example - Variable Values
+# Copy this to terraform.tfvars and customize
+
+# SSH key for node access
+ssh_key_path = "~/.ssh/id_rsa"
+
+# Node IP addresses
+control_plane_ip = "192.168.1.101"
+worker_ips = [
+  "192.168.1.102",
+  "192.168.1.103",
+  "192.168.1.104"
+]
+
+# MetalLB IP range (must be on same subnet, outside DHCP range)
+metallb_ip_range = "192.168.1.200-192.168.1.220"
+
+# Static IPs for services
+ingress_ip   = "192.168.1.200"
+portainer_ip = "192.168.1.201"
+
+# Grafana password (change this!)
+grafana_password = "your-secure-password"

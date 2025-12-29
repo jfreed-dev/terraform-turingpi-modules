@@ -2,36 +2,31 @@
 
 Reusable Terraform modules for Turing Pi cluster provisioning and management.
 
-## Modules
+## Cluster Modules
 
 | Module | Description |
 |--------|-------------|
 | [flash-nodes](./modules/flash-nodes) | Flash firmware to Turing Pi nodes |
-| [talos-cluster](./modules/talos-cluster) | Deploy Talos Kubernetes cluster |
-| [metallb](./modules/addons/metallb) | MetalLB load balancer addon |
-| [ingress-nginx](./modules/addons/ingress-nginx) | NGINX Ingress controller addon |
+| [talos-cluster](./modules/talos-cluster) | Deploy Talos Linux Kubernetes cluster |
+| [k3s-cluster](./modules/k3s-cluster) | Deploy K3s Kubernetes cluster on Armbian |
 
-## Quick Start
+## Addon Modules
+
+| Module | Description |
+|--------|-------------|
+| [metallb](./modules/addons/metallb) | MetalLB load balancer |
+| [ingress-nginx](./modules/addons/ingress-nginx) | NGINX Ingress controller |
+| [longhorn](./modules/addons/longhorn) | Distributed block storage with NVMe support |
+| [monitoring](./modules/addons/monitoring) | Prometheus, Grafana, Alertmanager stack |
+| [portainer](./modules/addons/portainer) | Cluster management agent (CE/BE) |
+
+## Quick Start - Talos
 
 ```hcl
-# Flash Talos to nodes
-module "flash" {
-  source  = "jfreed-dev/modules/turingpi//modules/flash-nodes"
-  version = ">= 1.0.0"
-
-  nodes = {
-    1 = { firmware = "talos-rk1-v1.9.1.raw.xz" }
-    2 = { firmware = "talos-rk1-v1.9.1.raw.xz" }
-    3 = { firmware = "talos-rk1-v1.9.1.raw.xz" }
-    4 = { firmware = "talos-rk1-v1.9.1.raw.xz" }
-  }
-}
-
 # Deploy Talos cluster
-module "cluster" {
-  source     = "jfreed-dev/modules/turingpi//modules/talos-cluster"
-  version    = "1.0.2"
-  depends_on = [module.flash]
+module "talos" {
+  source  = "jfreed-dev/modules/turingpi//modules/talos-cluster"
+  version = ">= 1.1.0"
 
   cluster_name     = "homelab"
   cluster_endpoint = "https://192.168.1.101:6443"
@@ -42,47 +37,125 @@ module "cluster" {
     { host = "192.168.1.103" },
     { host = "192.168.1.104" }
   ]
+
+  # Enable NVMe for Longhorn
+  nvme_storage_enabled = true
+
+  kubeconfig_path = "./kubeconfig"
 }
 
-# Deploy MetalLB
+# Add MetalLB
 module "metallb" {
   source     = "jfreed-dev/modules/turingpi//modules/addons/metallb"
-  version    = "1.0.2"
-  depends_on = [module.cluster]
+  depends_on = [module.talos]
+  ip_range   = "192.168.1.200-192.168.1.220"
+}
+```
 
-  ip_range = "192.168.1.200-192.168.1.220"
+## Quick Start - K3s (Armbian)
+
+```hcl
+# Deploy K3s cluster
+module "k3s" {
+  source  = "jfreed-dev/modules/turingpi//modules/k3s-cluster"
+  version = ">= 1.1.0"
+
+  cluster_name = "homelab"
+
+  control_plane = {
+    host     = "192.168.1.101"
+    ssh_user = "root"
+    ssh_key  = file("~/.ssh/id_rsa")
+  }
+
+  workers = [
+    { host = "192.168.1.102", ssh_user = "root", ssh_key = file("~/.ssh/id_rsa") },
+    { host = "192.168.1.103", ssh_user = "root", ssh_key = file("~/.ssh/id_rsa") },
+    { host = "192.168.1.104", ssh_user = "root", ssh_key = file("~/.ssh/id_rsa") }
+  ]
+
+  # Enable NVMe for Longhorn
+  nvme_storage_enabled = true
+
+  kubeconfig_path = "./kubeconfig"
 }
 
-# Deploy Ingress-NGINX
+# Add MetalLB
+module "metallb" {
+  source     = "jfreed-dev/modules/turingpi//modules/addons/metallb"
+  depends_on = [module.k3s]
+  ip_range   = "192.168.1.200-192.168.1.220"
+}
+```
+
+## Full Stack Example
+
+```hcl
+# Cluster (Talos or K3s)
+module "cluster" {
+  source = "..."  # talos-cluster or k3s-cluster
+  # ... cluster config
+}
+
+# MetalLB for LoadBalancer services
+module "metallb" {
+  source     = "jfreed-dev/modules/turingpi//modules/addons/metallb"
+  depends_on = [module.cluster]
+  ip_range   = "192.168.1.200-192.168.1.220"
+}
+
+# Ingress controller
 module "ingress" {
   source          = "jfreed-dev/modules/turingpi//modules/addons/ingress-nginx"
-  version         = "1.0.2"
   depends_on      = [module.metallb]
-
   loadbalancer_ip = "192.168.1.200"
+}
+
+# Distributed storage
+module "longhorn" {
+  source                    = "jfreed-dev/modules/turingpi//modules/addons/longhorn"
+  depends_on                = [module.cluster]
+  create_nvme_storage_class = true
+}
+
+# Monitoring
+module "monitoring" {
+  source                 = "jfreed-dev/modules/turingpi//modules/addons/monitoring"
+  depends_on             = [module.longhorn]
+  grafana_admin_password = var.grafana_password
+  storage_class          = "longhorn"
+}
+
+# Cluster management
+module "portainer" {
+  source          = "jfreed-dev/modules/turingpi//modules/addons/portainer"
+  depends_on      = [module.metallb]
+  loadbalancer_ip = "192.168.1.201"
 }
 ```
 
 ## Examples
 
-- [talos-full-stack](./examples/talos-full-stack) - Complete Talos cluster with MetalLB and Ingress
+| Example | Description |
+|---------|-------------|
+| [talos-full-stack](./examples/talos-full-stack) | Complete Talos cluster with all addons |
+| [k3s-full-stack](./examples/k3s-full-stack) | Complete K3s cluster with all addons |
+
+## Talos vs K3s
+
+| Feature | Talos | K3s (Armbian) |
+|---------|-------|---------------|
+| Security | Immutable, API-only | Standard Linux |
+| Updates | Image-based | apt + k3s script |
+| Access | talosctl | SSH |
+| Customization | Limited (secure) | Full Linux |
+| Best for | Production, security-focused | Development, flexibility |
 
 ## Requirements
 
 - Terraform >= 1.0
-- [Turing Pi Terraform Provider](https://github.com/jfreed-dev/terraform-provider-turingpi) >= 1.0
-- [Talos Terraform Provider](https://github.com/siderolabs/terraform-provider-talos) >= 0.7
-
-## Migration from turingpi_talos_cluster
-
-If you're migrating from the deprecated `turingpi_talos_cluster` resource:
-
-1. Export your cluster state (secrets, kubeconfig)
-2. Remove the old resource from state: `terraform state rm turingpi_talos_cluster.cluster`
-3. Import using the new modules
-4. Apply the new configuration
-
-See the [migration guide](./docs/MIGRATION.md) for detailed instructions.
+- [Turing Pi Provider](https://github.com/jfreed-dev/terraform-provider-turingpi) >= 1.0 (for flashing)
+- [Talos Provider](https://github.com/siderolabs/terraform-provider-talos) >= 0.7 (for Talos clusters)
 
 ## License
 
