@@ -16,7 +16,8 @@ Reusable Terraform modules for Turing Pi cluster provisioning and management.
 ```hcl
 # Flash Talos to nodes
 module "flash" {
-  source = "jfreed-dev/flash-nodes/turingpi"
+  source  = "jfreed-dev/modules/turingpi//modules/flash-nodes"
+  version = "1.0.2"
 
   nodes = {
     1 = { firmware = "talos-rk1-v1.9.1.raw.xz" }
@@ -28,7 +29,8 @@ module "flash" {
 
 # Deploy Talos cluster
 module "cluster" {
-  source     = "jfreed-dev/talos-cluster/turingpi"
+  source     = "jfreed-dev/modules/turingpi//modules/talos-cluster"
+  version    = "1.0.2"
   depends_on = [module.flash]
 
   cluster_name     = "homelab"
@@ -44,7 +46,8 @@ module "cluster" {
 
 # Deploy MetalLB
 module "metallb" {
-  source     = "jfreed-dev/metallb/kubernetes"
+  source     = "jfreed-dev/modules/turingpi//modules/addons/metallb"
+  version    = "1.0.2"
   depends_on = [module.cluster]
 
   ip_range = "192.168.1.200-192.168.1.220"
@@ -52,7 +55,8 @@ module "metallb" {
 
 # Deploy Ingress-NGINX
 module "ingress" {
-  source          = "jfreed-dev/ingress-nginx/kubernetes"
+  source          = "jfreed-dev/modules/turingpi//modules/addons/ingress-nginx"
+  version         = "1.0.2"
   depends_on      = [module.metallb]
 
   loadbalancer_ip = "192.168.1.200"
