@@ -13,7 +13,7 @@ provider "helm" {
 
 module "ingress" {
   source  = "jfreed-dev/ingress-nginx/kubernetes"
-  version = ">= 1.0.0"
+  version = ">= 1.2.0"
 
   loadbalancer_ip = "192.168.1.200"  # Optional: use with MetalLB
 }

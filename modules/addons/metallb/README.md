@@ -17,7 +17,7 @@ provider "kubectl" {
 
 module "metallb" {
   source  = "jfreed-dev/metallb/kubernetes"
-  version = ">= 1.0.0"
+  version = ">= 1.2.0"
 
   ip_range = "192.168.1.200-192.168.1.220"
 }

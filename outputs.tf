@@ -6,8 +6,12 @@ output "available_submodules" {
   value = [
     "modules/flash-nodes",
     "modules/talos-cluster",
+    "modules/k3s-cluster",
     "modules/addons/metallb",
     "modules/addons/ingress-nginx",
+    "modules/addons/longhorn",
+    "modules/addons/monitoring",
+    "modules/addons/portainer",
   ]
 }
 
@@ -16,7 +20,7 @@ output "usage_example" {
   value       = <<-EOT
     module "cluster" {
       source  = "jfreed-dev/modules/turingpi//modules/talos-cluster"
-      version = ">= 1.0.0"
+      version = ">= 1.2.0"
       # ... configuration
     }
   EOT
