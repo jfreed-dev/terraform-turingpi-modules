@@ -1,0 +1,18 @@
+# Turing Pi BMC credentials
+turingpi_endpoint = "https://turingpi.local"
+turingpi_username = "root"
+turingpi_password = "turing"
+
+# Firmware image path (download from Talos releases)
+talos_firmware = "/path/to/talos-rk1-v1.9.1.raw.xz"
+
+# Cluster configuration
+cluster_name     = "homelab"
+control_plane_ip = "192.168.1.101"
+worker_ips       = ["192.168.1.102", "192.168.1.103", "192.168.1.104"]
+
+# MetalLB IP range (must be in same subnet as nodes)
+metallb_ip_range = "192.168.1.200-192.168.1.220"
+
+# Ingress controller IP (should be within MetalLB range)
+ingress_ip = "192.168.1.200"

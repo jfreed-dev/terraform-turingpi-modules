@@ -1,0 +1,60 @@
+variable "cluster_name" {
+  description = "Name of the Kubernetes cluster"
+  type        = string
+}
+
+variable "cluster_endpoint" {
+  description = "Kubernetes API endpoint (https://IP:6443)"
+  type        = string
+}
+
+variable "control_plane" {
+  description = "Control plane node configurations"
+  type = list(object({
+    host     = string
+    hostname = optional(string)
+  }))
+  validation {
+    condition     = length(var.control_plane) >= 1
+    error_message = "At least one control plane node is required."
+  }
+}
+
+variable "workers" {
+  description = "Worker node configurations"
+  type = list(object({
+    host     = string
+    hostname = optional(string)
+  }))
+  default = []
+}
+
+variable "controlplane_patches" {
+  description = "Config patches for control plane nodes (YAML strings)"
+  type        = list(string)
+  default     = []
+}
+
+variable "worker_patches" {
+  description = "Config patches for worker nodes (YAML strings)"
+  type        = list(string)
+  default     = []
+}
+
+variable "kubeconfig_path" {
+  description = "Path to write kubeconfig file (optional)"
+  type        = string
+  default     = null
+}
+
+variable "talosconfig_path" {
+  description = "Path to write talosconfig file (optional)"
+  type        = string
+  default     = null
+}
+
+variable "allow_scheduling_on_control_plane" {
+  description = "Allow workloads on control plane nodes"
+  type        = bool
+  default     = true
+}
