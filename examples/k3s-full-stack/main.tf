@@ -88,8 +88,8 @@ module "k3s" {
   nvme_control_plane   = true
 
   # Disable built-ins (use addons instead)
-  disable_traefik     = true
-  disable_servicelb   = true
+  disable_traefik   = true
+  disable_servicelb = true
 
   kubeconfig_path = "${path.module}/kubeconfig"
 }
@@ -147,9 +147,9 @@ module "monitoring" {
   source     = "../../modules/addons/monitoring"
   depends_on = [module.longhorn]
 
-  grafana_admin_password     = var.grafana_password
+  grafana_admin_password      = var.grafana_password
   grafana_persistence_enabled = true
-  storage_class              = "longhorn"
+  storage_class               = "longhorn"
 
   prometheus_retention    = "15d"
   prometheus_storage_size = "20Gi"

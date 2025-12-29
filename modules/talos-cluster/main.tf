@@ -86,16 +86,16 @@ resource "talos_cluster_kubeconfig" "this" {
 
 # Write kubeconfig to file if path specified
 resource "local_file" "kubeconfig" {
-  count    = var.kubeconfig_path != null ? 1 : 0
-  content  = talos_cluster_kubeconfig.this.kubeconfig_raw
-  filename = var.kubeconfig_path
+  count           = var.kubeconfig_path != null ? 1 : 0
+  content         = talos_cluster_kubeconfig.this.kubeconfig_raw
+  filename        = var.kubeconfig_path
   file_permission = "0600"
 }
 
 # Write talosconfig to file if path specified
 resource "local_file" "talosconfig" {
-  count    = var.talosconfig_path != null ? 1 : 0
-  content  = yamlencode(talos_machine_secrets.this.client_configuration)
-  filename = var.talosconfig_path
+  count           = var.talosconfig_path != null ? 1 : 0
+  content         = yamlencode(talos_machine_secrets.this.client_configuration)
+  filename        = var.talosconfig_path
   file_permission = "0600"
 }

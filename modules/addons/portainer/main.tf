@@ -63,7 +63,7 @@ resource "kubectl_manifest" "service" {
       } : {}
     }
     spec = {
-      type     = var.service_type
+      type = var.service_type
       selector = {
         app = "portainer-agent"
       }

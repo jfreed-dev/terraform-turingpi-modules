@@ -41,7 +41,7 @@ locals {
     enabled          = true
     ingressClassName = "nginx"
     hosts            = [var.grafana_ingress_host]
-  } : {
+    } : {
     enabled          = false
     ingressClassName = ""
     hosts            = []
@@ -51,7 +51,7 @@ locals {
     enabled          = true
     ingressClassName = "nginx"
     hosts            = [var.prometheus_ingress_host]
-  } : {
+    } : {
     enabled          = false
     ingressClassName = ""
     hosts            = []
@@ -61,7 +61,7 @@ locals {
     enabled          = true
     ingressClassName = "nginx"
     hosts            = [var.alertmanager_ingress_host]
-  } : {
+    } : {
     enabled          = false
     ingressClassName = ""
     hosts            = []
