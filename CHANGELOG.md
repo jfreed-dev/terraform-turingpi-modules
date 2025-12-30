@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.2] - 2025-12-30
+
+### Changed
+- Bump actions/checkout from v4 to v6
+- Bump terraform-linters/setup-tflint from v4 to v6
+
 ## [1.3.1] - 2025-12-30
 
 ### Added
