@@ -18,25 +18,34 @@ module "flash" {
 }
 ```
 
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
 |------|---------|
-| terraform | >= 1.0 |
-| turingpi | >= 1.2.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
+| <a name="requirement_turingpi"></a> [turingpi](#requirement\_turingpi) | >= 1.0 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_turingpi"></a> [turingpi](#provider\_turingpi) | >= 1.0 |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| nodes | Map of node number to firmware configuration | `map(object({ firmware = string }))` | n/a | yes |
-| power_on_after_flash | Power on nodes after flashing | `bool` | `true` | no |
+| <a name="input_nodes"></a> [nodes](#input\_nodes) | Map of node number to firmware configuration | <pre>map(object({<br/>    firmware = string<br/>  }))</pre> | n/a | yes |
+| <a name="input_power_on_after_flash"></a> [power\_on\_after\_flash](#input\_power\_on\_after\_flash) | Power on nodes after flashing | `bool` | `true` | no |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| flashed_nodes | List of flashed node numbers |
+| <a name="output_flashed_nodes"></a> [flashed\_nodes](#output\_flashed\_nodes) | Map of nodes that were flashed |
+| <a name="output_powered_nodes"></a> [powered\_nodes](#output\_powered\_nodes) | Map of nodes that were powered on |
+<!-- END_TF_DOCS -->
 
 ## License
 

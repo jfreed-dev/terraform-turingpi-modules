@@ -61,46 +61,54 @@ module "cluster" {
 }
 ```
 
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
 |------|---------|
-| terraform | >= 1.0 |
-| talos | >= 0.7 |
-| local | >= 2.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
+| <a name="requirement_local"></a> [local](#requirement\_local) | >= 2.0 |
+| <a name="requirement_talos"></a> [talos](#requirement\_talos) | >= 0.7 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_local"></a> [local](#provider\_local) | >= 2.0 |
+| <a name="provider_talos"></a> [talos](#provider\_talos) | >= 0.7 |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| cluster_name | Name of the Kubernetes cluster | `string` | n/a | yes |
-| cluster_endpoint | Kubernetes API endpoint (https://IP:6443) | `string` | n/a | yes |
-| control_plane | Control plane node configurations | `list(object({ host = string, hostname = optional(string) }))` | n/a | yes |
-| workers | Worker node configurations | `list(object({ host = string, hostname = optional(string) }))` | `[]` | no |
-| talos_version | Talos version for config generation (e.g., 'v1.9.2'). Must match Talos image on nodes. | `string` | `null` | no |
-| kubernetes_version | Kubernetes version (e.g., 'v1.32.1'). Must be compatible with the Talos version. | `string` | `null` | no |
-| controlplane_patches | Config patches for control plane nodes (YAML strings) | `list(string)` | `[]` | no |
-| worker_patches | Config patches for worker nodes (YAML strings) | `list(string)` | `[]` | no |
-| kubeconfig_path | Path to write kubeconfig file | `string` | `null` | no |
-| talosconfig_path | Path to write talosconfig file | `string` | `null` | no |
-| allow_scheduling_on_control_plane | Allow workloads on control plane nodes | `bool` | `true` | no |
-| nvme_storage_enabled | Enable NVMe storage configuration for Longhorn | `bool` | `false` | no |
-| nvme_device | NVMe device path | `string` | `"/dev/nvme0n1"` | no |
-| nvme_mountpoint | Mount point for NVMe storage | `string` | `"/var/mnt/longhorn"` | no |
-| nvme_control_plane | Configure NVMe on control plane nodes | `bool` | `true` | no |
+| <a name="input_cluster_endpoint"></a> [cluster\_endpoint](#input\_cluster\_endpoint) | Kubernetes API endpoint (https://IP:6443) | `string` | n/a | yes |
+| <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | Name of the Kubernetes cluster | `string` | n/a | yes |
+| <a name="input_control_plane"></a> [control\_plane](#input\_control\_plane) | Control plane node configurations | <pre>list(object({<br/>    host     = string<br/>    hostname = optional(string)<br/>  }))</pre> | n/a | yes |
+| <a name="input_controlplane_patches"></a> [controlplane\_patches](#input\_controlplane\_patches) | Config patches for control plane nodes (YAML strings) | `list(string)` | `[]` | no |
+| <a name="input_kubeconfig_path"></a> [kubeconfig\_path](#input\_kubeconfig\_path) | Path to write kubeconfig file (optional) | `string` | `null` | no |
+| <a name="input_kubernetes_version"></a> [kubernetes\_version](#input\_kubernetes\_version) | Kubernetes version (e.g., 'v1.32.1'). Must be compatible with the Talos version. | `string` | `null` | no |
+| <a name="input_nvme_control_plane"></a> [nvme\_control\_plane](#input\_nvme\_control\_plane) | Configure NVMe on control plane nodes (in addition to workers) | `bool` | `true` | no |
+| <a name="input_nvme_device"></a> [nvme\_device](#input\_nvme\_device) | NVMe device path | `string` | `"/dev/nvme0n1"` | no |
+| <a name="input_nvme_mountpoint"></a> [nvme\_mountpoint](#input\_nvme\_mountpoint) | Mount point for NVMe storage | `string` | `"/var/mnt/longhorn"` | no |
+| <a name="input_nvme_storage_enabled"></a> [nvme\_storage\_enabled](#input\_nvme\_storage\_enabled) | Enable NVMe storage configuration for Longhorn | `bool` | `false` | no |
+| <a name="input_talos_version"></a> [talos\_version](#input\_talos\_version) | Talos version for config generation (e.g., 'v1.11.6'). Must match the Talos image on nodes. | `string` | `null` | no |
+| <a name="input_talosconfig_path"></a> [talosconfig\_path](#input\_talosconfig\_path) | Path to write talosconfig file (optional) | `string` | `null` | no |
+| <a name="input_worker_patches"></a> [worker\_patches](#input\_worker\_patches) | Config patches for worker nodes (YAML strings) | `list(string)` | `[]` | no |
+| <a name="input_workers"></a> [workers](#input\_workers) | Worker node configurations | <pre>list(object({<br/>    host     = string<br/>    hostname = optional(string)<br/>  }))</pre> | `[]` | no |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| kubeconfig | Kubeconfig for cluster access (sensitive) |
-| client_configuration | Talos client configuration for talosctl (sensitive) |
-| machine_secrets | Talos machine secrets for backup (sensitive) |
-| cluster_endpoint | Kubernetes API endpoint |
-| cluster_name | Cluster name |
-| kubeconfig_path | Path to kubeconfig file (if written) |
-| nvme_enabled | Whether NVMe storage is configured |
-| nvme_mountpoint | NVMe mount point (if enabled) |
+| <a name="output_client_configuration"></a> [client\_configuration](#output\_client\_configuration) | Talos client configuration for talosctl |
+| <a name="output_cluster_endpoint"></a> [cluster\_endpoint](#output\_cluster\_endpoint) | Kubernetes API endpoint |
+| <a name="output_cluster_name"></a> [cluster\_name](#output\_cluster\_name) | Cluster name |
+| <a name="output_kubeconfig"></a> [kubeconfig](#output\_kubeconfig) | Kubeconfig for cluster access |
+| <a name="output_kubeconfig_path"></a> [kubeconfig\_path](#output\_kubeconfig\_path) | Path to kubeconfig file (if written) |
+| <a name="output_machine_secrets"></a> [machine\_secrets](#output\_machine\_secrets) | Talos machine secrets (for backup) |
+| <a name="output_nvme_enabled"></a> [nvme\_enabled](#output\_nvme\_enabled) | Whether NVMe storage is configured |
+| <a name="output_nvme_mountpoint"></a> [nvme\_mountpoint](#output\_nvme\_mountpoint) | NVMe mount point (if enabled) |
+<!-- END_TF_DOCS -->
 
 ## NVMe Storage Configuration
 
