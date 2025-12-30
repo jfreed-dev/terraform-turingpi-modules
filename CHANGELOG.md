@@ -131,7 +131,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **metallb addon** - MetalLB load balancer
 - **ingress-nginx addon** - NGINX Ingress controller
 
-[Unreleased]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.1...HEAD
+[Unreleased]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.2...HEAD
+[1.3.2]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.2.4...v1.3.0
 [1.2.4]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.2.3...v1.2.4
