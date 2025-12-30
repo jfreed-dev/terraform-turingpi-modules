@@ -9,7 +9,7 @@ The agent allows you to connect this Kubernetes cluster to a Portainer CE (Commu
 ```hcl
 module "portainer" {
   source  = "jfreed-dev/modules/turingpi//modules/addons/portainer"
-  version = ">= 1.2.0"
+  version = ">= 1.3.0"
 
   # Use LoadBalancer with MetalLB
   service_type    = "LoadBalancer"
@@ -151,7 +151,7 @@ output "portainer_url" {
 # Deploy Talos cluster
 module "cluster" {
   source  = "jfreed-dev/modules/turingpi//modules/talos-cluster"
-  version = ">= 1.2.0"
+  version = ">= 1.3.0"
 
   cluster_name     = "homelab"
   cluster_endpoint = "https://192.168.1.101:6443"

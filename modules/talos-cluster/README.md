@@ -7,7 +7,7 @@ Terraform module to deploy a Talos Kubernetes cluster on Turing Pi 2.5 nodes usi
 ```hcl
 module "cluster" {
   source  = "jfreed-dev/modules/turingpi//modules/talos-cluster"
-  version = ">= 1.2.4"
+  version = ">= 1.3.0"
 
   cluster_name     = "my-cluster"
   cluster_endpoint = "https://192.168.1.101:6443"
@@ -35,7 +35,7 @@ module "cluster" {
 ```hcl
 module "cluster" {
   source  = "jfreed-dev/modules/turingpi//modules/talos-cluster"
-  version = ">= 1.2.4"
+  version = ">= 1.3.0"
 
   cluster_name     = "my-cluster"
   cluster_endpoint = "https://192.168.1.101:6443"
@@ -135,7 +135,7 @@ After enabling NVMe storage, configure Longhorn to use it:
 ```hcl
 module "longhorn" {
   source  = "jfreed-dev/modules/turingpi//modules/addons/longhorn"
-  version = ">= 1.2.4"
+  version = ">= 1.3.0"
 
   depends_on = [module.cluster]
 

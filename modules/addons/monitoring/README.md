@@ -14,7 +14,7 @@ Includes:
 ```hcl
 module "monitoring" {
   source  = "jfreed-dev/modules/turingpi//modules/addons/monitoring"
-  version = ">= 1.2.0"
+  version = ">= 1.3.0"
 
   # Change default password!
   grafana_admin_password = "your-secure-password"

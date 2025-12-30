@@ -7,7 +7,7 @@ Terraform module to flash firmware to Turing Pi 2.5 nodes.
 ```hcl
 module "flash" {
   source  = "jfreed-dev/flash-nodes/turingpi"
-  version = ">= 1.2.0"
+  version = ">= 1.3.0"
 
   nodes = {
     1 = { firmware = "/path/to/talos-arm64.raw" }
