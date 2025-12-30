@@ -1,0 +1,101 @@
+version: 2
+updates:
+  - package-ecosystem: terraform
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - terraform
+
+  - package-ecosystem: terraform
+    directory: /modules/flash-nodes
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - terraform
+
+  - package-ecosystem: terraform
+    directory: /modules/k3s-cluster
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - terraform
+
+  - package-ecosystem: terraform
+    directory: /modules/talos-cluster
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - terraform
+
+  - package-ecosystem: terraform
+    directory: /modules/addons/metallb
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - terraform
+
+  - package-ecosystem: terraform
+    directory: /modules/addons/ingress-nginx
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - terraform
+
+  - package-ecosystem: terraform
+    directory: /modules/addons/longhorn
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - terraform
+
+  - package-ecosystem: terraform
+    directory: /modules/addons/monitoring
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - terraform
+
+  - package-ecosystem: terraform
+    directory: /modules/addons/portainer
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - terraform
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - github-actions
