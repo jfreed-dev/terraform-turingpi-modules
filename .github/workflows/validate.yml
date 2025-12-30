@@ -1,0 +1,45 @@
+name: Terraform Validate
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '**.tf'
+      - '.github/workflows/validate.yml'
+
+jobs:
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        module:
+          - modules/flash-nodes
+          - modules/k3s-cluster
+          - modules/talos-cluster
+          - modules/addons/metallb
+          - modules/addons/ingress-nginx
+          - modules/addons/longhorn
+          - modules/addons/monitoring
+          - modules/addons/portainer
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+        working-directory: ${{ matrix.module }}
+
+      - name: Terraform Init
+        run: terraform init -backend=false
+        working-directory: ${{ matrix.module }}
+
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: ${{ matrix.module }}
