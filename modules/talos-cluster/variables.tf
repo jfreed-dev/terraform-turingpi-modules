@@ -83,3 +83,15 @@ variable "nvme_control_plane" {
   type        = bool
   default     = true
 }
+
+variable "talos_version" {
+  description = "Talos version for config generation (e.g., 'v1.11.6'). Must match the Talos image on nodes."
+  type        = string
+  default     = null
+}
+
+variable "kubernetes_version" {
+  description = "Kubernetes version (e.g., 'v1.32.1'). Must be compatible with the Talos version."
+  type        = string
+  default     = null
+}

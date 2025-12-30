@@ -32,22 +32,26 @@ resource "talos_machine_secrets" "this" {}
 
 # Generate control plane machine configuration
 data "talos_machine_configuration" "controlplane" {
-  cluster_name     = var.cluster_name
-  cluster_endpoint = var.cluster_endpoint
-  machine_type     = "controlplane"
-  machine_secrets  = talos_machine_secrets.this.machine_secrets
-  config_patches   = local.controlplane_patches_combined
+  cluster_name       = var.cluster_name
+  cluster_endpoint   = var.cluster_endpoint
+  machine_type       = "controlplane"
+  machine_secrets    = talos_machine_secrets.this.machine_secrets
+  config_patches     = local.controlplane_patches_combined
+  talos_version      = var.talos_version
+  kubernetes_version = var.kubernetes_version
 }
 
 # Generate worker machine configuration
 data "talos_machine_configuration" "worker" {
   count = length(var.workers) > 0 ? 1 : 0
 
-  cluster_name     = var.cluster_name
-  cluster_endpoint = var.cluster_endpoint
-  machine_type     = "worker"
-  machine_secrets  = talos_machine_secrets.this.machine_secrets
-  config_patches   = local.worker_patches_combined
+  cluster_name       = var.cluster_name
+  cluster_endpoint   = var.cluster_endpoint
+  machine_type       = "worker"
+  machine_secrets    = talos_machine_secrets.this.machine_secrets
+  config_patches     = local.worker_patches_combined
+  talos_version      = var.talos_version
+  kubernetes_version = var.kubernetes_version
 }
 
 # Apply configuration to control plane nodes
