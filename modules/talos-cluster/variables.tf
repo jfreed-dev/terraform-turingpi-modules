@@ -53,12 +53,6 @@ variable "talosconfig_path" {
   default     = null
 }
 
-variable "allow_scheduling_on_control_plane" {
-  description = "Allow workloads on control plane nodes"
-  type        = bool
-  default     = true
-}
-
 # NVMe Storage Configuration
 variable "nvme_storage_enabled" {
   description = "Enable NVMe storage configuration for Longhorn"
