@@ -49,9 +49,9 @@ jobs:
         uses: terraform-linters/setup-tflint@v4
 
       - name: TFLint Init
-        run: tflint --init
+        run: tflint --init --config "$GITHUB_WORKSPACE/.tflint.hcl"
         working-directory: ${{ matrix.module }}
 
       - name: TFLint
-        run: tflint --format compact
+        run: tflint --config "$GITHUB_WORKSPACE/.tflint.hcl" --format compact
         working-directory: ${{ matrix.module }}
