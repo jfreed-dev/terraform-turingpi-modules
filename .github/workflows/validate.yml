@@ -55,3 +55,19 @@ jobs:
       - name: TFLint
         run: tflint --config "$GITHUB_WORKSPACE/.tflint.hcl" --format compact
         working-directory: ${{ matrix.module }}
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Trivy security scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: config
+          scan-ref: .
+          trivy-config: trivy.yaml
+          exit-code: 1

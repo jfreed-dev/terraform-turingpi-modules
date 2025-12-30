@@ -1,0 +1,12 @@
+scan:
+  skip-dirs:
+    - test
+    - examples
+    - .terraform
+
+severity:
+  - HIGH
+  - CRITICAL
+
+exit-code: 1
+format: table
