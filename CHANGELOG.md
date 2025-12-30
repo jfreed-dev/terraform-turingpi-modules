@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.7] - 2025-12-30
+
+### Added
+- terraform-docs integration for auto-generated module documentation
+- `.terraform-docs.yml` configuration file
+- GitHub Actions workflow to auto-update docs on PRs
+
 ## [1.2.6] - 2025-12-30
 
 ### Added
@@ -115,7 +122,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **metallb addon** - MetalLB load balancer
 - **ingress-nginx addon** - NGINX Ingress controller
 
-[Unreleased]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.2.6...HEAD
+[Unreleased]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.2.7...HEAD
+[1.2.7]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.2.6...v1.2.7
 [1.2.6]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.2.5...v1.2.6
 [1.2.5]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.2.4...v1.2.5
 [1.2.4]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.2.3...v1.2.4
