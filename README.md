@@ -26,7 +26,7 @@ Reusable Terraform modules for Turing Pi cluster provisioning and management.
 # Deploy Talos cluster
 module "talos" {
   source  = "jfreed-dev/modules/turingpi//modules/talos-cluster"
-  version = ">= 1.2.0"
+  version = ">= 1.3.0"
 
   cluster_name     = "homelab"
   cluster_endpoint = "https://192.168.1.101:6443"
@@ -58,7 +58,7 @@ module "metallb" {
 # Deploy K3s cluster
 module "k3s" {
   source  = "jfreed-dev/modules/turingpi//modules/k3s-cluster"
-  version = ">= 1.2.0"
+  version = ">= 1.3.0"
 
   cluster_name = "homelab"
 
@@ -154,7 +154,7 @@ module "portainer" {
 ## Requirements
 
 - Terraform >= 1.0
-- [Turing Pi Provider](https://github.com/jfreed-dev/terraform-provider-turingpi) >= 1.2.0 (for flashing)
+- [Turing Pi Provider](https://github.com/jfreed-dev/terraform-provider-turingpi) >= 1.3.0 (for flashing)
 - [Talos Provider](https://github.com/siderolabs/terraform-provider-talos) >= 0.7 (for Talos clusters)
 
 ## License
