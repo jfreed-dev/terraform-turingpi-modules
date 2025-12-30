@@ -1,5 +1,8 @@
 # Turing Pi Flash Nodes Module
 
+[![Terraform Registry](https://img.shields.io/badge/Terraform%20Registry-jfreed--dev%2Fturingpi-blue?logo=terraform)](https://registry.terraform.io/modules/jfreed-dev/modules/turingpi/latest/submodules/flash-nodes)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 Terraform module to flash firmware to Turing Pi 2.5 nodes.
 
 ## Usage

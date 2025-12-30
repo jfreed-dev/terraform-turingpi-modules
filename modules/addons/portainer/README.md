@@ -1,5 +1,8 @@
 # Portainer Agent Module
 
+[![Terraform Registry](https://img.shields.io/badge/Terraform%20Registry-jfreed--dev%2Fturingpi-blue?logo=terraform)](https://registry.terraform.io/modules/jfreed-dev/modules/turingpi/latest/submodules/addons-portainer)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 Terraform module to deploy the [Portainer](https://www.portainer.io/) agent for remote cluster management.
 
 The agent allows you to connect this Kubernetes cluster to a Portainer CE (Community Edition) or Business Edition instance for visual management.

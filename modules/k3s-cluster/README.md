@@ -1,5 +1,8 @@
 # K3s Cluster Module
 
+[![Terraform Registry](https://img.shields.io/badge/Terraform%20Registry-jfreed--dev%2Fturingpi-blue?logo=terraform)](https://registry.terraform.io/modules/jfreed-dev/modules/turingpi/latest/submodules/k3s-cluster)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 Terraform module to deploy a K3s Kubernetes cluster on Turing Pi 2.5 nodes running Armbian (or other Debian-based distributions).
 
 This module connects to nodes via SSH, prepares them (packages, NVMe storage), and installs K3s using the official installation script.
