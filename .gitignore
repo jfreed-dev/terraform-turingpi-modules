@@ -18,3 +18,7 @@ Thumbs.db
 # Generated files
 kubeconfig
 talosconfig
+
+# Local development
+firmware/
+test/
