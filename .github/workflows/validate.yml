@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - '**.tf'
+      - '.tflint.hcl'
       - '.github/workflows/validate.yml'
 
 jobs:
@@ -42,4 +43,15 @@ jobs:
 
       - name: Terraform Validate
         run: terraform validate
+        working-directory: ${{ matrix.module }}
+
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4
+
+      - name: TFLint Init
+        run: tflint --init
+        working-directory: ${{ matrix.module }}
+
+      - name: TFLint
+        run: tflint --format compact
         working-directory: ${{ matrix.module }}
