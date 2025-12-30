@@ -40,76 +40,66 @@ module "monitoring" {
 }
 ```
 
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
 |------|---------|
-| terraform | >= 1.0 |
-| helm | >= 2.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
+| <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 2.0 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_helm"></a> [helm](#provider\_helm) | >= 2.0 |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| chart_version | Helm chart version | `string` | `"65.8.1"` | no |
-| timeout | Helm install timeout | `number` | `600` | no |
-| storage_class | Storage class for PVs | `string` | `"longhorn"` | no |
-
-### Grafana
-
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| grafana_enabled | Enable Grafana | `bool` | `true` | no |
-| grafana_admin_password | Admin password | `string` | `"admin"` | no |
-| grafana_persistence_enabled | Enable storage | `bool` | `true` | no |
-| grafana_storage_size | PV size | `string` | `"5Gi"` | no |
-| grafana_ingress_enabled | Enable Ingress | `bool` | `false` | no |
-| grafana_ingress_host | Ingress hostname | `string` | `"grafana.local"` | no |
-
-### Prometheus
-
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| prometheus_enabled | Enable Prometheus | `bool` | `true` | no |
-| prometheus_retention | Data retention | `string` | `"15d"` | no |
-| prometheus_retention_size | Max storage size | `string` | `"18GB"` | no |
-| prometheus_storage_size | PV size | `string` | `"20Gi"` | no |
-| prometheus_memory_request | Memory request | `string` | `"512Mi"` | no |
-| prometheus_memory_limit | Memory limit | `string` | `"2Gi"` | no |
-| prometheus_cpu_request | CPU request | `string` | `"250m"` | no |
-| prometheus_cpu_limit | CPU limit | `string` | `"1000m"` | no |
-| prometheus_ingress_enabled | Enable Ingress | `bool` | `false` | no |
-| prometheus_ingress_host | Ingress hostname | `string` | `"prometheus.local"` | no |
-
-### Alertmanager
-
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| alertmanager_enabled | Enable Alertmanager | `bool` | `true` | no |
-| alertmanager_storage_size | PV size | `string` | `"2Gi"` | no |
-| alertmanager_ingress_enabled | Enable Ingress | `bool` | `false` | no |
-| alertmanager_ingress_host | Ingress hostname | `string` | `"alertmanager.local"` | no |
-
-### External Monitoring
-
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| control_plane_endpoint | CP IP for component scraping | `string` | `null` | no |
-| external_targets | External node_exporter hosts | `list(string)` | `[]` | no |
-| docker_hosts | Docker daemon metrics hosts | `list(string)` | `[]` | no |
-| cadvisor_hosts | cAdvisor hosts | `list(string)` | `[]` | no |
+| <a name="input_alertmanager_enabled"></a> [alertmanager\_enabled](#input\_alertmanager\_enabled) | Enable Alertmanager deployment | `bool` | `true` | no |
+| <a name="input_alertmanager_ingress_enabled"></a> [alertmanager\_ingress\_enabled](#input\_alertmanager\_ingress\_enabled) | Enable Ingress for Alertmanager | `bool` | `false` | no |
+| <a name="input_alertmanager_ingress_host"></a> [alertmanager\_ingress\_host](#input\_alertmanager\_ingress\_host) | Hostname for Alertmanager Ingress | `string` | `"alertmanager.local"` | no |
+| <a name="input_alertmanager_storage_size"></a> [alertmanager\_storage\_size](#input\_alertmanager\_storage\_size) | Alertmanager persistent volume size | `string` | `"2Gi"` | no |
+| <a name="input_cadvisor_hosts"></a> [cadvisor\_hosts](#input\_cadvisor\_hosts) | List of hosts running cAdvisor to monitor (port 8080) | `list(string)` | `[]` | no |
+| <a name="input_chart_version"></a> [chart\_version](#input\_chart\_version) | kube-prometheus-stack Helm chart version | `string` | `"65.8.1"` | no |
+| <a name="input_control_plane_endpoint"></a> [control\_plane\_endpoint](#input\_control\_plane\_endpoint) | Control plane IP for scraping kube-controller-manager, kube-scheduler, etcd | `string` | `null` | no |
+| <a name="input_docker_hosts"></a> [docker\_hosts](#input\_docker\_hosts) | List of Docker host IPs to monitor (port 9323) | `list(string)` | `[]` | no |
+| <a name="input_external_targets"></a> [external\_targets](#input\_external\_targets) | List of external host IPs to monitor with node\_exporter (port 9100) | `list(string)` | `[]` | no |
+| <a name="input_grafana_admin_password"></a> [grafana\_admin\_password](#input\_grafana\_admin\_password) | Grafana admin password | `string` | `"admin"` | no |
+| <a name="input_grafana_enabled"></a> [grafana\_enabled](#input\_grafana\_enabled) | Enable Grafana deployment | `bool` | `true` | no |
+| <a name="input_grafana_ingress_enabled"></a> [grafana\_ingress\_enabled](#input\_grafana\_ingress\_enabled) | Enable Ingress for Grafana | `bool` | `false` | no |
+| <a name="input_grafana_ingress_host"></a> [grafana\_ingress\_host](#input\_grafana\_ingress\_host) | Hostname for Grafana Ingress | `string` | `"grafana.local"` | no |
+| <a name="input_grafana_persistence_enabled"></a> [grafana\_persistence\_enabled](#input\_grafana\_persistence\_enabled) | Enable persistent storage for Grafana | `bool` | `true` | no |
+| <a name="input_grafana_storage_size"></a> [grafana\_storage\_size](#input\_grafana\_storage\_size) | Grafana persistent volume size | `string` | `"5Gi"` | no |
+| <a name="input_kube_state_metrics_enabled"></a> [kube\_state\_metrics\_enabled](#input\_kube\_state\_metrics\_enabled) | Enable kube-state-metrics | `bool` | `true` | no |
+| <a name="input_node_exporter_enabled"></a> [node\_exporter\_enabled](#input\_node\_exporter\_enabled) | Enable Node Exporter for host metrics | `bool` | `true` | no |
+| <a name="input_prometheus_cpu_limit"></a> [prometheus\_cpu\_limit](#input\_prometheus\_cpu\_limit) | Prometheus CPU limit | `string` | `"1000m"` | no |
+| <a name="input_prometheus_cpu_request"></a> [prometheus\_cpu\_request](#input\_prometheus\_cpu\_request) | Prometheus CPU request | `string` | `"250m"` | no |
+| <a name="input_prometheus_enabled"></a> [prometheus\_enabled](#input\_prometheus\_enabled) | Enable Prometheus deployment | `bool` | `true` | no |
+| <a name="input_prometheus_ingress_enabled"></a> [prometheus\_ingress\_enabled](#input\_prometheus\_ingress\_enabled) | Enable Ingress for Prometheus | `bool` | `false` | no |
+| <a name="input_prometheus_ingress_host"></a> [prometheus\_ingress\_host](#input\_prometheus\_ingress\_host) | Hostname for Prometheus Ingress | `string` | `"prometheus.local"` | no |
+| <a name="input_prometheus_memory_limit"></a> [prometheus\_memory\_limit](#input\_prometheus\_memory\_limit) | Prometheus memory limit | `string` | `"2Gi"` | no |
+| <a name="input_prometheus_memory_request"></a> [prometheus\_memory\_request](#input\_prometheus\_memory\_request) | Prometheus memory request | `string` | `"512Mi"` | no |
+| <a name="input_prometheus_retention"></a> [prometheus\_retention](#input\_prometheus\_retention) | Prometheus data retention period | `string` | `"15d"` | no |
+| <a name="input_prometheus_retention_size"></a> [prometheus\_retention\_size](#input\_prometheus\_retention\_size) | Prometheus data retention size | `string` | `"18GB"` | no |
+| <a name="input_prometheus_storage_size"></a> [prometheus\_storage\_size](#input\_prometheus\_storage\_size) | Prometheus persistent volume size | `string` | `"20Gi"` | no |
+| <a name="input_storage_class"></a> [storage\_class](#input\_storage\_class) | Storage class for persistent volumes | `string` | `"longhorn"` | no |
+| <a name="input_timeout"></a> [timeout](#input\_timeout) | Helm install timeout in seconds | `number` | `600` | no |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| namespace | Monitoring namespace |
-| chart_version | Deployed chart version |
-| grafana_url | Grafana URL (if ingress enabled) |
-| prometheus_url | Prometheus URL (if ingress enabled) |
-| alertmanager_url | Alertmanager URL (if ingress enabled) |
-| grafana_service | Grafana service name |
-| prometheus_service | Prometheus service name |
+| <a name="output_alertmanager_url"></a> [alertmanager\_url](#output\_alertmanager\_url) | Alertmanager URL (if ingress enabled) |
+| <a name="output_chart_version"></a> [chart\_version](#output\_chart\_version) | Deployed chart version |
+| <a name="output_grafana_service"></a> [grafana\_service](#output\_grafana\_service) | Grafana service name for port-forwarding |
+| <a name="output_grafana_url"></a> [grafana\_url](#output\_grafana\_url) | Grafana URL (if ingress enabled) |
+| <a name="output_namespace"></a> [namespace](#output\_namespace) | Monitoring namespace |
+| <a name="output_prometheus_service"></a> [prometheus\_service](#output\_prometheus\_service) | Prometheus service name for port-forwarding |
+| <a name="output_prometheus_url"></a> [prometheus\_url](#output\_prometheus\_url) | Prometheus URL (if ingress enabled) |
+<!-- END_TF_DOCS -->
 
 ## Accessing Without Ingress
 

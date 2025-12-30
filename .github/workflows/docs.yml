@@ -1,0 +1,109 @@
+name: Terraform Docs
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '**.tf'
+      - '.terraform-docs.yml'
+
+jobs:
+  docs:
+    name: Generate Docs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Generate docs for modules/flash-nodes
+        uses: terraform-docs/gh-actions@v1
+        with:
+          working-dir: modules/flash-nodes
+          config-file: .terraform-docs.yml
+          output-file: README.md
+          output-method: inject
+          git-push: false
+
+      - name: Generate docs for modules/k3s-cluster
+        uses: terraform-docs/gh-actions@v1
+        with:
+          working-dir: modules/k3s-cluster
+          config-file: .terraform-docs.yml
+          output-file: README.md
+          output-method: inject
+          git-push: false
+
+      - name: Generate docs for modules/talos-cluster
+        uses: terraform-docs/gh-actions@v1
+        with:
+          working-dir: modules/talos-cluster
+          config-file: .terraform-docs.yml
+          output-file: README.md
+          output-method: inject
+          git-push: false
+
+      - name: Generate docs for modules/addons/metallb
+        uses: terraform-docs/gh-actions@v1
+        with:
+          working-dir: modules/addons/metallb
+          config-file: .terraform-docs.yml
+          output-file: README.md
+          output-method: inject
+          git-push: false
+
+      - name: Generate docs for modules/addons/ingress-nginx
+        uses: terraform-docs/gh-actions@v1
+        with:
+          working-dir: modules/addons/ingress-nginx
+          config-file: .terraform-docs.yml
+          output-file: README.md
+          output-method: inject
+          git-push: false
+
+      - name: Generate docs for modules/addons/longhorn
+        uses: terraform-docs/gh-actions@v1
+        with:
+          working-dir: modules/addons/longhorn
+          config-file: .terraform-docs.yml
+          output-file: README.md
+          output-method: inject
+          git-push: false
+
+      - name: Generate docs for modules/addons/monitoring
+        uses: terraform-docs/gh-actions@v1
+        with:
+          working-dir: modules/addons/monitoring
+          config-file: .terraform-docs.yml
+          output-file: README.md
+          output-method: inject
+          git-push: false
+
+      - name: Generate docs for modules/addons/portainer
+        uses: terraform-docs/gh-actions@v1
+        with:
+          working-dir: modules/addons/portainer
+          config-file: .terraform-docs.yml
+          output-file: README.md
+          output-method: inject
+          git-push: false
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "docs: auto-generate module documentation"
+          git push

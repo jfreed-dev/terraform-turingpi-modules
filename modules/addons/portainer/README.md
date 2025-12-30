@@ -23,39 +23,47 @@ module "portainer" {
 
 Then connect from your Portainer instance using the agent URL.
 
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
-|------|---------:|
-| terraform | >= 1.0 |
-| kubectl | >= 1.14 |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
+| <a name="requirement_kubectl"></a> [kubectl](#requirement\_kubectl) | >= 1.14 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_kubectl"></a> [kubectl](#provider\_kubectl) | >= 1.14 |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| agent_version | Portainer agent version | `string` | `"2.24.1"` | no |
-| service_type | Service type (NodePort or LoadBalancer) | `string` | `"LoadBalancer"` | no |
-| loadbalancer_ip | LoadBalancer IP for MetalLB | `string` | `null` | no |
-| node_port | NodePort port number | `number` | `30778` | no |
-| log_level | Agent log level | `string` | `"INFO"` | no |
-| memory_request | Memory request | `string` | `"64Mi"` | no |
-| memory_limit | Memory limit | `string` | `"256Mi"` | no |
-| cpu_request | CPU request | `string` | `"50m"` | no |
-| cpu_limit | CPU limit | `string` | `"500m"` | no |
+| <a name="input_agent_version"></a> [agent\_version](#input\_agent\_version) | Portainer agent version | `string` | `"2.24.1"` | no |
+| <a name="input_cpu_limit"></a> [cpu\_limit](#input\_cpu\_limit) | CPU limit | `string` | `"500m"` | no |
+| <a name="input_cpu_request"></a> [cpu\_request](#input\_cpu\_request) | CPU request | `string` | `"50m"` | no |
+| <a name="input_loadbalancer_ip"></a> [loadbalancer\_ip](#input\_loadbalancer\_ip) | LoadBalancer IP (for MetalLB, optional) | `string` | `null` | no |
+| <a name="input_log_level"></a> [log\_level](#input\_log\_level) | Agent log level (DEBUG, INFO, WARN, ERROR) | `string` | `"INFO"` | no |
+| <a name="input_memory_limit"></a> [memory\_limit](#input\_memory\_limit) | Memory limit | `string` | `"256Mi"` | no |
+| <a name="input_memory_request"></a> [memory\_request](#input\_memory\_request) | Memory request | `string` | `"64Mi"` | no |
+| <a name="input_node_port"></a> [node\_port](#input\_node\_port) | NodePort port number (when service\_type is NodePort) | `number` | `30778` | no |
+| <a name="input_service_type"></a> [service\_type](#input\_service\_type) | Service type: NodePort or LoadBalancer | `string` | `"LoadBalancer"` | no |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| namespace | Portainer namespace |
-| service_name | Agent service name |
-| service_type | Service type |
-| agent_port | Agent port (9001) |
-| node_port | NodePort (if applicable) |
-| loadbalancer_ip | LoadBalancer IP (if specified) |
-| connection_url | URL to connect from Portainer |
-| agent_version | Deployed agent version |
+| <a name="output_agent_port"></a> [agent\_port](#output\_agent\_port) | Agent port |
+| <a name="output_agent_version"></a> [agent\_version](#output\_agent\_version) | Deployed agent version |
+| <a name="output_connection_url"></a> [connection\_url](#output\_connection\_url) | URL to connect from Portainer CE/BE |
+| <a name="output_loadbalancer_ip"></a> [loadbalancer\_ip](#output\_loadbalancer\_ip) | LoadBalancer IP (if specified) |
+| <a name="output_namespace"></a> [namespace](#output\_namespace) | Portainer namespace |
+| <a name="output_node_port"></a> [node\_port](#output\_node\_port) | NodePort (if service type is NodePort) |
+| <a name="output_service_name"></a> [service\_name](#output\_service\_name) | Portainer agent service name |
+| <a name="output_service_type"></a> [service\_type](#output\_service\_type) | Service type |
+<!-- END_TF_DOCS -->
 
 ## Connecting to Portainer
 

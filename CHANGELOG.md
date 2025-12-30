@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2025-12-30
+
+### Added
+
+#### CI/CD & Automation
+- GitHub Actions workflow for Terraform validation (fmt, init, validate) on PRs
+- TFLint integration with recommended ruleset (`.tflint.hcl`)
+- Trivy security scanning for misconfigurations (`trivy.yaml`)
+- terraform-docs integration for auto-generated documentation (`.terraform-docs.yml`)
+- Dependabot for Terraform provider and GitHub Actions updates
+- Pre-commit hooks for local validation (`.pre-commit-config.yaml`)
+- CODEOWNERS file for automatic PR review requests
+
+#### Repository Configuration
+- Branch protection with required status checks and code owner reviews
+- Issue templates (bug report, feature request)
+- Pull request template with validation checklist
+- CONTRIBUTING guide with development setup instructions
+
+### Removed
+- Unused `install_timeout` variable from k3s-cluster module
+- Unused `allow_scheduling_on_control_plane` variable from talos-cluster module
+
 ## [1.2.4] - 2025-12-30
 
 ### Added
@@ -97,7 +120,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **metallb addon** - MetalLB load balancer
 - **ingress-nginx addon** - NGINX Ingress controller
 
-[Unreleased]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.2.4...HEAD
+[Unreleased]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.2.4...v1.3.0
 [1.2.4]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.2.3...v1.2.4
 [1.2.3]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.2.2...v1.2.3
 [1.2.2]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.2.1...v1.2.2

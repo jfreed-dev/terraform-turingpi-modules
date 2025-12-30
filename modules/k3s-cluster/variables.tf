@@ -52,12 +52,6 @@ variable "kubeconfig_path" {
   default     = null
 }
 
-variable "install_timeout" {
-  description = "Timeout in seconds for K3s installation"
-  type        = number
-  default     = 600
-}
-
 # K3s Configuration Options
 variable "disable_traefik" {
   description = "Disable the built-in Traefik ingress controller"
