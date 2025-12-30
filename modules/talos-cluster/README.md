@@ -7,10 +7,14 @@ Terraform module to deploy a Talos Kubernetes cluster on Turing Pi 2.5 nodes usi
 ```hcl
 module "cluster" {
   source  = "jfreed-dev/modules/turingpi//modules/talos-cluster"
-  version = ">= 1.2.0"
+  version = ">= 1.2.4"
 
   cluster_name     = "my-cluster"
   cluster_endpoint = "https://192.168.1.101:6443"
+
+  # Pin versions to match your Talos image
+  talos_version      = "v1.9.2"
+  kubernetes_version = "v1.32.1"
 
   control_plane = [
     { host = "192.168.1.101", hostname = "cp1" }
@@ -31,10 +35,13 @@ module "cluster" {
 ```hcl
 module "cluster" {
   source  = "jfreed-dev/modules/turingpi//modules/talos-cluster"
-  version = ">= 1.2.0"
+  version = ">= 1.2.4"
 
   cluster_name     = "my-cluster"
   cluster_endpoint = "https://192.168.1.101:6443"
+
+  talos_version      = "v1.9.2"
+  kubernetes_version = "v1.32.1"
 
   control_plane = [{ host = "192.168.1.101" }]
   workers = [
@@ -70,6 +77,8 @@ module "cluster" {
 | cluster_endpoint | Kubernetes API endpoint (https://IP:6443) | `string` | n/a | yes |
 | control_plane | Control plane node configurations | `list(object({ host = string, hostname = optional(string) }))` | n/a | yes |
 | workers | Worker node configurations | `list(object({ host = string, hostname = optional(string) }))` | `[]` | no |
+| talos_version | Talos version for config generation (e.g., 'v1.9.2'). Must match Talos image on nodes. | `string` | `null` | no |
+| kubernetes_version | Kubernetes version (e.g., 'v1.32.1'). Must be compatible with the Talos version. | `string` | `null` | no |
 | controlplane_patches | Config patches for control plane nodes (YAML strings) | `list(string)` | `[]` | no |
 | worker_patches | Config patches for worker nodes (YAML strings) | `list(string)` | `[]` | no |
 | kubeconfig_path | Path to write kubeconfig file | `string` | `null` | no |
@@ -118,7 +127,7 @@ After enabling NVMe storage, configure Longhorn to use it:
 ```hcl
 module "longhorn" {
   source  = "jfreed-dev/modules/turingpi//modules/addons/longhorn"
-  version = ">= 1.2.0"
+  version = ">= 1.2.4"
 
   depends_on = [module.cluster]
 
