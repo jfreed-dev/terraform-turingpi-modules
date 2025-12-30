@@ -1,5 +1,9 @@
 # Terraform Turing Pi Modules
 
+[![Terraform Validate](https://github.com/jfreed-dev/terraform-turingpi-modules/actions/workflows/validate.yml/badge.svg)](https://github.com/jfreed-dev/terraform-turingpi-modules/actions/workflows/validate.yml)
+[![Terraform Registry](https://img.shields.io/badge/Terraform%20Registry-jfreed--dev%2Fturingpi-blue?logo=terraform)](https://registry.terraform.io/modules/jfreed-dev/modules/turingpi/latest)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 Reusable Terraform modules for Turing Pi cluster provisioning and management.
 
 ## Cluster Modules
