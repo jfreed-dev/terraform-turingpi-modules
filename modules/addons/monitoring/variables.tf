@@ -4,6 +4,12 @@ variable "chart_version" {
   default     = "65.8.1"
 }
 
+variable "namespace" {
+  description = "Kubernetes namespace for monitoring stack"
+  type        = string
+  default     = "monitoring"
+}
+
 variable "timeout" {
   description = "Helm install timeout in seconds"
   type        = number
@@ -24,10 +30,14 @@ variable "grafana_enabled" {
 }
 
 variable "grafana_admin_password" {
-  description = "Grafana admin password"
+  description = "Grafana admin password (minimum 8 characters recommended)"
   type        = string
   sensitive   = true
-  default     = "admin"
+
+  validation {
+    condition     = length(var.grafana_admin_password) >= 8
+    error_message = "Grafana admin password should be at least 8 characters for security."
+  }
 }
 
 variable "grafana_persistence_enabled" {

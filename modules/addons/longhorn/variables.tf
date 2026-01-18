@@ -4,10 +4,37 @@ variable "chart_version" {
   default     = "1.7.2"
 }
 
+variable "namespace" {
+  description = "Kubernetes namespace for Longhorn"
+  type        = string
+  default     = "longhorn-system"
+}
+
 variable "timeout" {
   description = "Helm install timeout in seconds"
   type        = number
   default     = 600
+}
+
+variable "manager_resources" {
+  description = "Resource requests/limits for Longhorn manager"
+  type = object({
+    requests = optional(object({
+      cpu    = optional(string, "100m")
+      memory = optional(string, "128Mi")
+    }), {})
+    limits = optional(object({
+      cpu    = optional(string, "500m")
+      memory = optional(string, "512Mi")
+    }), {})
+  })
+  default = {}
+}
+
+variable "ui_replicas" {
+  description = "Number of Longhorn UI replicas"
+  type        = number
+  default     = 1
 }
 
 variable "default_replica_count" {

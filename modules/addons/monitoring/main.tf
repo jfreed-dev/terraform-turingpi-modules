@@ -214,7 +214,7 @@ resource "helm_release" "kube_prometheus_stack" {
   repository       = "https://prometheus-community.github.io/helm-charts"
   chart            = "kube-prometheus-stack"
   version          = var.chart_version
-  namespace        = "monitoring"
+  namespace        = var.namespace
   create_namespace = true
   wait             = true
   timeout          = var.timeout

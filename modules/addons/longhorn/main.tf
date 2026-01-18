@@ -21,14 +21,18 @@ locals {
     longhornManager = {
       resources = {
         requests = {
-          memory = "128Mi"
-          cpu    = "100m"
+          memory = var.manager_resources.requests.memory
+          cpu    = var.manager_resources.requests.cpu
+        }
+        limits = {
+          memory = var.manager_resources.limits.memory
+          cpu    = var.manager_resources.limits.cpu
         }
       }
     }
 
     longhornUI = {
-      replicas = 1
+      replicas = var.ui_replicas
     }
   })
 }
@@ -38,7 +42,7 @@ resource "helm_release" "longhorn" {
   repository       = "https://charts.longhorn.io"
   chart            = "longhorn"
   version          = var.chart_version
-  namespace        = "longhorn-system"
+  namespace        = var.namespace
   create_namespace = true
   wait             = true
   timeout          = var.timeout
@@ -84,7 +88,7 @@ resource "kubectl_manifest" "longhorn_ingress" {
     kind       = "Ingress"
     metadata = {
       name      = "longhorn-ingress"
-      namespace = "longhorn-system"
+      namespace = var.namespace
       annotations = merge(
         {
           "kubernetes.io/ingress.class" = "nginx"

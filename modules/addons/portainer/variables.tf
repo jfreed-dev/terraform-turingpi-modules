@@ -4,6 +4,18 @@ variable "agent_version" {
   default     = "2.24.1"
 }
 
+variable "namespace" {
+  description = "Kubernetes namespace for Portainer"
+  type        = string
+  default     = "portainer"
+}
+
+variable "replicas" {
+  description = "Number of Portainer agent replicas"
+  type        = number
+  default     = 1
+}
+
 variable "service_type" {
   description = "Service type: NodePort or LoadBalancer"
   type        = string

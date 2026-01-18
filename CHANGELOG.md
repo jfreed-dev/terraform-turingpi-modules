@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.5] - 2026-01-18
+
+### Added
+- **cert-manager addon module** - TLS certificate management with Let's Encrypt and self-signed CA support
+- docs/UPGRADE.md with comprehensive upgrade guidance
+- `namespace` variable to all addon modules (metallb, ingress-nginx, longhorn, monitoring, portainer)
+- `controller_resources` and `speaker_resources` to MetalLB module
+- `controller_replicas`, `controller_resources`, `enable_metrics` to ingress-nginx module
+- `manager_resources`, `ui_replicas` to Longhorn module
+- `replicas` variable to Portainer module
+- Grafana password validation (minimum 8 characters) in monitoring module
+
+### Changed
+- All addon modules now use configurable namespaces instead of hardcoded values
+- Improved resource configuration flexibility across all addon modules
+
+### Fixed
+- MetalLB and cert-manager modules now use `values` block instead of `set` blocks for Helm provider v3.x compatibility
+
 ## [1.3.4] - 2026-01-18
 
 ### Changed

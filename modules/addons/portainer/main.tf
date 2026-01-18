@@ -4,7 +4,7 @@ resource "kubectl_manifest" "namespace" {
     apiVersion = "v1"
     kind       = "Namespace"
     metadata = {
-      name = "portainer"
+      name = var.namespace
     }
   })
 }
@@ -18,7 +18,7 @@ resource "kubectl_manifest" "service_account" {
     kind       = "ServiceAccount"
     metadata = {
       name      = "portainer-sa-clusteradmin"
-      namespace = "portainer"
+      namespace = var.namespace
     }
   })
 }
@@ -42,7 +42,7 @@ resource "kubectl_manifest" "cluster_role_binding" {
       {
         kind      = "ServiceAccount"
         name      = "portainer-sa-clusteradmin"
-        namespace = "portainer"
+        namespace = var.namespace
       }
     ]
   })
@@ -57,7 +57,7 @@ resource "kubectl_manifest" "service" {
     kind       = "Service"
     metadata = {
       name      = "portainer-agent"
-      namespace = "portainer"
+      namespace = var.namespace
       annotations = var.loadbalancer_ip != null ? {
         "metallb.universe.tf/loadBalancerIPs" = var.loadbalancer_ip
       } : {}
@@ -89,7 +89,7 @@ resource "kubectl_manifest" "service_headless" {
     kind       = "Service"
     metadata = {
       name      = "portainer-agent-headless"
-      namespace = "portainer"
+      namespace = var.namespace
     }
     spec = {
       clusterIP = "None"
@@ -113,10 +113,10 @@ resource "kubectl_manifest" "deployment" {
     kind       = "Deployment"
     metadata = {
       name      = "portainer-agent"
-      namespace = "portainer"
+      namespace = var.namespace
     }
     spec = {
-      replicas = 1
+      replicas = var.replicas
       selector = {
         matchLabels = {
           app = "portainer-agent"
