@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.3] - 2026-01-18
+
+### Added
+- CODE_OF_CONDUCT.md (Contributor Covenant v2.0)
+- docs/ARCHITECTURE.md with module dependency diagrams
+- Security workflow with Trivy scanning and dependency review
+
+### Changed
+- Enhanced SECURITY.md with supply chain security section
+- Enhanced CODEOWNERS with per-path ownership
+- Enhanced CONTRIBUTING.md with release process
+- Enhanced pre-commit hooks with additional checks
+- README badges updated
+
 ## [1.3.2] - 2025-12-30
 
 ### Changed
@@ -131,7 +145,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **metallb addon** - MetalLB load balancer
 - **ingress-nginx addon** - NGINX Ingress controller
 
-[Unreleased]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.2...HEAD
+[Unreleased]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.3...HEAD
+[1.3.3]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.2...v1.3.3
 [1.3.2]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.2.4...v1.3.0

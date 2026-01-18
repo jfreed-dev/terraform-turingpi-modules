@@ -141,6 +141,59 @@ Follow conventional commit style:
 - `chore:` Maintenance tasks
 - `refactor:` Code refactoring
 
+## Release Process (Maintainers)
+
+Releases are created by tagging the main branch. All releases are GPG-signed.
+
+### Creating a Release
+
+1. Update `CHANGELOG.md` with the new version
+2. Commit the changelog update:
+   ```bash
+   git add CHANGELOG.md
+   git commit -S -m "docs: update changelog for v1.x.x"
+   ```
+3. Create a signed tag:
+   ```bash
+   git tag -s v1.x.x -m "Release v1.x.x"
+   ```
+4. Push to origin:
+   ```bash
+   git push origin main --tags
+   ```
+
+### Post-Release
+
+After pushing the tag:
+1. Verify the release appears on [GitHub Releases](https://github.com/jfreed-dev/terraform-turingpi-modules/releases)
+2. Confirm it syncs to [Terraform Registry](https://registry.terraform.io/modules/jfreed-dev/modules/turingpi)
+
+### Requirements
+
+- GPG key configured for commit/tag signing (`git config commit.gpgsign true`)
+- GPG key registered on GitHub for verified badges
+- Push access to the repository
+
+## Branch Protection (Maintainers)
+
+The `main` branch has protection rules configured in GitHub. Recommended settings:
+
+### Required Status Checks
+
+Enable "Require status checks to pass before merging" with these checks:
+- `validate` (Terraform validation)
+- `trivy` (Security scanning)
+- `dependency-review` (For PRs)
+
+### Additional Protections
+
+- **Require pull request reviews**: At least 1 approving review
+- **Dismiss stale reviews**: When new commits are pushed
+- **Require review from Code Owners**: Enabled (see CODEOWNERS)
+- **Require signed commits**: Recommended for verified releases
+- **Require linear history**: Optional, keeps history clean
+- **Do not allow bypassing**: Even admins should follow the rules
+
 ## Questions?
 
 Open an issue for questions or suggestions.

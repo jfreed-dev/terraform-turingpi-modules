@@ -6,6 +6,9 @@ repos:
       - id: end-of-file-fixer
       - id: check-yaml
       - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: detect-private-key
+      - id: check-json
 
   - repo: https://github.com/antonbabenko/pre-commit-terraform
     rev: v1.96.3

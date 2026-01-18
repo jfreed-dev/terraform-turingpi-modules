@@ -1,2 +1,11 @@
 # Default code owners for all files
 * @jfreed-dev
+
+# GitHub configuration
+.github/ @jfreed-dev
+
+# Security-sensitive files
+SECURITY.md @jfreed-dev
+
+# Module code
+modules/ @jfreed-dev

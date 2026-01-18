@@ -1,0 +1,88 @@
+name: Security
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  schedule:
+    # Run weekly on Monday at 00:00 UTC
+    - cron: '0 0 * * 1'
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  # Verify commit signatures on PRs
+  verify-signatures:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify commit signatures
+        run: |
+          echo "Checking commit signatures for PR commits..."
+          # Get the merge base and check all commits since then
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+
+          UNSIGNED_COMMITS=""
+          while IFS= read -r commit; do
+            if ! git verify-commit "$commit" 2>/dev/null; then
+              UNSIGNED_COMMITS="$UNSIGNED_COMMITS $commit"
+            fi
+          done < <(git rev-list "$BASE_SHA".."$HEAD_SHA")
+
+          if [ -n "$UNSIGNED_COMMITS" ]; then
+            echo "::warning::The following commits are not signed:$UNSIGNED_COMMITS"
+            echo "Consider signing your commits with GPG. See: https://docs.github.com/en/authentication/managing-commit-signature-verification"
+          else
+            echo "All commits are signed!"
+          fi
+
+  # Dependency review for PRs
+  dependency-review:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v4
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@3c4e3dcb1aa7874d2c16be7d79418e9b7efd6261 # v4.8.2
+
+  # Trivy vulnerability scanning for Terraform
+  trivy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v4
+
+      - name: Run Trivy vulnerability scanner (IaC)
+        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # v0.33.1
+        with:
+          scan-type: 'config'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-iac-results.sarif'
+          severity: 'CRITICAL,HIGH,MEDIUM'
+          skip-dirs: 'test'
+
+      - name: Upload Trivy IaC scan results
+        uses: github/codeql-action/upload-sarif@cdefb33c0f6224e58673d9004f47f7cb3e328b89 # v4.31.10
+        with:
+          sarif_file: 'trivy-iac-results.sarif'
+          category: 'trivy-iac'
+        if: always()
+
+      - name: Run Trivy license scanner
+        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # v0.33.1
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          scanners: 'license'
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
+        continue-on-error: true
