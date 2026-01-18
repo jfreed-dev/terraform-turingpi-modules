@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.4] - 2026-01-18
+
+### Changed
+- Synchronized release with terraform-provider-turingpi v1.3.4
+- Provider now supports BMC firmware 2.3.4 API response format
+
 ## [1.3.3] - 2026-01-18
 
 ### Added
