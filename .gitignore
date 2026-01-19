@@ -14,21 +14,82 @@ CODEX.md
 *.tfstate
 *.tfstate.backup
 *.tfplan
+*.auto.tfvars
+terraform.tfvars
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
 
 # IDE
 .idea/
 .vscode/
 *.swp
 *.swo
+*.sublime-workspace
+*.sublime-project
 
 # OS
 .DS_Store
+.AppleDouble
+.LSOverride
+._*
 Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*~
 
-# Generated files
+# Security - Private keys and certificates
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+known_hosts
+
+# Security - Credentials and secrets
+.env
+.env.*
+*credentials*
+*secrets*
+*.secret
+*token*
+
+# Kubernetes configs (may contain credentials)
 kubeconfig
-talosconfig
+kubeconfig.yaml
+kubeconfig.yml
+*.kubeconfig
 
-# Local development
+# Talos configs (may contain credentials)
+talosconfig
+*.talosconfig
+
+# Generated/downloaded files
 firmware/
+*.img
+*.img.xz
+*.raw
+*.raw.xz
+
+# Local development and testing
 test/
+testing/
+tmp/
+temp/
+
+# Logs
+*.log
+logs/
+
+# Node.js (for any tooling)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
