@@ -404,7 +404,7 @@ for node in 10.10.88.73 10.10.88.74 10.10.88.75 10.10.88.76; do
 done
 ```
 
-#### Step 4: Deploy Cluster
+#### Step 6: Deploy Cluster
 
 ```hcl
 module "k3s_cluster" {
@@ -413,24 +413,30 @@ module "k3s_cluster" {
   cluster_name = "k3s-cluster"
 
   control_plane = {
-    host     = "10.10.88.74"
+    host     = "10.10.88.73"
     ssh_user = "root"
     ssh_key  = file("~/.ssh/id_ed25519")
-    hostname = "k3s-cp1"
+    hostname = "turing-cp1"
   }
 
   workers = [
     {
+      host     = "10.10.88.74"
+      ssh_user = "root"
+      ssh_key  = file("~/.ssh/id_ed25519")
+      hostname = "turing-w1"
+    },
+    {
       host     = "10.10.88.75"
       ssh_user = "root"
       ssh_key  = file("~/.ssh/id_ed25519")
-      hostname = "k3s-w1"
+      hostname = "turing-w2"
     },
     {
       host     = "10.10.88.76"
       ssh_user = "root"
       ssh_key  = file("~/.ssh/id_ed25519")
-      hostname = "k3s-w2"
+      hostname = "turing-w3"
     }
   ]
 
@@ -455,7 +461,7 @@ module "k3s_cluster" {
 }
 ```
 
-#### Step 5: Deploy Addons
+#### Step 7: Deploy Addons
 
 See [Addon Module Deployment](#addon-module-deployment) section.
 
