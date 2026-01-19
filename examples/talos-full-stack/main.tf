@@ -46,7 +46,7 @@ module "talos_image" {
 
   talos_version = var.talos_version
   architecture  = var.talos_architecture
-  preset        = "longhorn"  # Includes iscsi-tools + util-linux-tools
+  preset        = "longhorn" # Includes iscsi-tools + util-linux-tools
 }
 
 # =============================================================================

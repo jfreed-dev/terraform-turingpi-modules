@@ -31,9 +31,9 @@ locals {
   }
 
   # Check if we have a known schematic ID
-  extensions_key   = join(",", sort(local.all_extensions))
-  known_schematic  = lookup(local.known_schematics, local.extensions_key, null)
-  use_known        = local.known_schematic != null
+  extensions_key  = join(",", sort(local.all_extensions))
+  known_schematic = lookup(local.known_schematics, local.extensions_key, null)
+  use_known       = local.known_schematic != null
 }
 
 # Create schematic via Image Factory API (only if not using known schematic)
