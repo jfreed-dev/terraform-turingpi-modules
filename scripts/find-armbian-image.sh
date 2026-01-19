@@ -15,6 +15,7 @@
 #   --root-password PASS    Root password for autoconfig (default: 1234)
 #   --hostname NAME         Hostname for autoconfig
 #   --timezone TZ           Timezone for autoconfig (default: UTC)
+#   --ssh-key FILE          SSH public key file to add for passwordless access
 #   -h, --help              Show this help message
 
 set -euo pipefail
@@ -29,13 +30,14 @@ AUTOCONFIG_FILE=""
 ROOT_PASSWORD="1234"
 HOSTNAME=""
 TIMEZONE="UTC"
+SSH_KEY_FILE=""
 
 # GitHub API
 REPO="armbian/community"
 API_URL="https://api.github.com/repos/${REPO}/releases"
 
 show_help() {
-    head -21 "$0" | tail -18
+    head -22 "$0" | tail -19
     exit 0
 }
 
@@ -51,6 +53,7 @@ while [[ $# -gt 0 ]]; do
         --root-password) ROOT_PASSWORD="$2"; shift 2 ;;
         --hostname) HOSTNAME="$2"; shift 2 ;;
         --timezone) TIMEZONE="$2"; shift 2 ;;
+        --ssh-key) SSH_KEY_FILE="$2"; shift 2 ;;
         -h|--help) show_help ;;
         *) echo "Unknown option: $1"; show_help ;;
     esac
@@ -88,8 +91,38 @@ EOF
         echo "#   hostnamectl set-hostname ${HOSTNAME}" >> "$AUTOCONFIG_FILE"
     fi
 
+    # Add SSH key if provided
+    if [[ -n "$SSH_KEY_FILE" && -f "$SSH_KEY_FILE" ]]; then
+        SSH_PUBKEY=$(cat "$SSH_KEY_FILE")
+        cat >> "$AUTOCONFIG_FILE" << SSHEOF
+
+# SSH Key Setup (runs on first boot)
+# This script runs after first boot to set up SSH key authentication
+FR_general_run_user_script=1
+cat > /root/first_run_script.sh << 'SCRIPT'
+#!/bin/bash
+mkdir -p /root/.ssh
+chmod 700 /root/.ssh
+echo "${SSH_PUBKEY}" >> /root/.ssh/authorized_keys
+chmod 600 /root/.ssh/authorized_keys
+SCRIPT
+chmod +x /root/first_run_script.sh
+SSHEOF
+        echo "  SSH key added from: $SSH_KEY_FILE"
+    fi
+
     echo ""
     echo "Autoconfig file created: $AUTOCONFIG_FILE"
+    echo ""
+    echo "Contents configured:"
+    echo "  - Root password: ${ROOT_PASSWORD}"
+    echo "  - Timezone: ${TIMEZONE}"
+    if [[ -n "$HOSTNAME" ]]; then
+        echo "  - Hostname hint: ${HOSTNAME}"
+    fi
+    if [[ -n "$SSH_KEY_FILE" ]]; then
+        echo "  - SSH key: ${SSH_KEY_FILE}"
+    fi
     echo ""
     echo "To use with existing installation:"
     echo "  1. Mount the eMMC/SD card on your workstation"

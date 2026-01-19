@@ -191,6 +191,12 @@ Example usage:
 
 # Find minimal trixie image URL for BMC flash
 ./scripts/find-armbian-image.sh -v minimal -r trixie
+
+# Generate autoconfig for first-boot setup (password, SSH key, timezone)
+./scripts/find-armbian-image.sh --autoconfig first_run.txt \
+    --root-password "YourPassword" \
+    --ssh-key ~/.ssh/id_ed25519.pub \
+    --timezone "America/Chicago"
 ```
 
 ## Talos vs K3s

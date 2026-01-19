@@ -239,58 +239,128 @@ flowchart TD
 
 ### K3s Deployment Steps
 
-#### Step 1: Prepare Armbian Image
+#### Step 1: Find and Download Armbian Image
 
-Download from trusted source (e.g., Armbian official or custom build):
+Use the helper script to find the latest Armbian image for Turing RK1:
 
 ```bash
-# Example: Download Armbian for Turing RK1
-curl -LO "https://armbian-builds.example.com/turing-rk1/Armbian_bookworm.img.xz"
-xz -d Armbian_bookworm.img.xz
+# List available images
+./scripts/find-armbian-image.sh --list
+
+# Get URL for latest minimal trixie image
+./scripts/find-armbian-image.sh -v minimal -r trixie
+
+# Or download directly
+./scripts/find-armbian-image.sh -v minimal -r trixie --download
 ```
 
-**Optional: Armbian Autoconfig**
+#### Step 2: Generate Autoconfig (Optional but Recommended)
 
-Create `/boot/armbian_first_run.txt` for automated first-boot setup:
+Create an autoconfig file for automated first-boot setup:
 
 ```bash
-# Armbian first run configuration
+# Generate autoconfig with password and SSH key
+./scripts/find-armbian-image.sh \
+    --autoconfig armbian_first_run.txt \
+    --root-password "YourSecurePassword" \
+    --timezone "America/Chicago" \
+    --ssh-key ~/.ssh/id_ed25519.pub
+```
+
+This creates `/boot/armbian_first_run.txt` with:
+- Root password preset
+- Timezone configuration
+- SSH public key for passwordless access
+
+**Manual Autoconfig Format:**
+
+```bash
+# /boot/armbian_first_run.txt
+FR_net_change_defaults=1
+FR_general_delete_firstrun_file_after_completion=1
+
 PRESET_ROOT_PASSWORD="YourSecurePassword"
-PRESET_ROOT_KEY="ssh-ed25519 AAAA... root@cluster.local"
+PRESET_USER_NAME=""
 PRESET_LOCALE="en_US.UTF-8"
 PRESET_TIMEZONE="America/Chicago"
-PRESET_USER_NAME=""
 ```
 
 See [Armbian Autoconfig Documentation](https://docs.armbian.com/User-Guide_Autoconfig/)
 
-#### Step 2: Flash Nodes
+#### Step 3: Flash Nodes via BMC
+
+**Option A: Direct URL Flash (Recommended)**
+
+Flash directly from GitHub URL without downloading:
+
+```bash
+ARMBIAN_URL="https://github.com/armbian/community/releases/download/26.2.0-trunk.151/Armbian_community_26.2.0-trunk.151_Turing-rk1_trixie_vendor_6.1.115_minimal.img.xz"
+
+# Flash each node (BMC API uses 0-3 for nodes 1-4)
+for node in 1 2 3 0; do
+    curl -sk -u root:turing "https://BMC_IP/api/bmc?opt=set&type=flash&node=${node}&file=${ARMBIAN_URL}"
+    # Wait for flash to complete before next node
+    while curl -sk -u root:turing "https://BMC_IP/api/bmc?opt=get&type=flash" | grep -q "Transferring"; do
+        sleep 30
+    done
+done
+```
+
+**Option B: Terraform Module**
 
 ```hcl
 module "flash" {
   source = "jfreed-dev/modules/turingpi//modules/flash-nodes"
 
   nodes = {
-    2 = { firmware = "./Armbian_bookworm.img" }
-    3 = { firmware = "./Armbian_bookworm.img" }
-    4 = { firmware = "./Armbian_bookworm.img" }
+    1 = { firmware = "./Armbian_trixie.img" }
+    2 = { firmware = "./Armbian_trixie.img" }
+    3 = { firmware = "./Armbian_trixie.img" }
+    4 = { firmware = "./Armbian_trixie.img" }
   }
 
   power_on_after_flash = true
 }
 ```
 
-**Note:** Flash nodes sequentially if USB bandwidth is limited.
+#### Step 4: Configure Nodes (If Not Using Autoconfig)
 
-#### Step 3: Configure SSH Access
-
-After first boot, configure SSH keys:
+After first boot with default credentials (root/1234):
 
 ```bash
 SSH_KEY="~/.ssh/id_ed25519"
-for node in 10.10.88.74 10.10.88.75 10.10.88.76; do
-  ssh-copy-id -i $SSH_KEY root@$node
-  ssh -i $SSH_KEY root@$node "hostnamectl set-hostname k3s-node-${node##*.}"
+NEW_PASSWORD="YourSecurePassword"
+
+declare -A NODES
+NODES["10.10.88.73"]="turing-cp1"
+NODES["10.10.88.74"]="turing-w1"
+NODES["10.10.88.75"]="turing-w2"
+NODES["10.10.88.76"]="turing-w3"
+
+for ip in "${!NODES[@]}"; do
+    hostname="${NODES[$ip]}"
+    sshpass -p "1234" ssh -o StrictHostKeyChecking=no root@$ip bash <<REMOTE
+# Change password
+echo "root:${NEW_PASSWORD}" | chpasswd
+
+# Set hostname
+hostnamectl set-hostname ${hostname}
+
+# Add SSH key
+mkdir -p ~/.ssh && chmod 700 ~/.ssh
+echo "$(cat ${SSH_KEY}.pub)" >> ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/authorized_keys
+REMOTE
+done
+```
+
+#### Step 5: Install K3s Prerequisites
+
+Each node needs iSCSI support for Longhorn:
+
+```bash
+for node in 10.10.88.73 10.10.88.74 10.10.88.75 10.10.88.76; do
+    ssh -i $SSH_KEY root@$node "apt-get update && apt-get install -y open-iscsi nfs-common && systemctl enable iscsid && systemctl start iscsid"
 done
 ```
 

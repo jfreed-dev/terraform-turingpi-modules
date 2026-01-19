@@ -12,6 +12,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Lists all available images with `--list`
   - Downloads images with `--download`
   - Generates Armbian autoconfig files for first-boot setup with `--autoconfig`
+  - SSH public key setup with `--ssh-key` for passwordless access
+
+### Changed
+- Enhanced docs/WORKFLOWS.md with comprehensive K3s deployment steps
+  - Direct URL flashing via BMC API
+  - Autoconfig generation for automated first-boot setup
+  - Node configuration scripts for password, hostname, SSH keys
+  - K3s prerequisites (open-iscsi, nfs-common) for Longhorn support
 
 ## [1.3.8] - 2026-01-19
 
