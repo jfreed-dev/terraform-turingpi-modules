@@ -31,6 +31,11 @@ output "kubeconfig_path" {
   value       = var.kubeconfig_path != null ? var.kubeconfig_path : null
 }
 
+output "talosconfig_path" {
+  description = "Path to talosconfig file (if written)"
+  value       = var.talosconfig_path != null ? var.talosconfig_path : null
+}
+
 output "nvme_enabled" {
   description = "Whether NVMe storage is configured"
   value       = var.nvme_storage_enabled

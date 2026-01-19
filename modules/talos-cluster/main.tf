@@ -97,9 +97,24 @@ resource "local_file" "kubeconfig" {
 }
 
 # Write talosconfig to file if path specified
+# Format: proper talosctl YAML with context, endpoints, and nodes
 resource "local_file" "talosconfig" {
-  count           = var.talosconfig_path != null ? 1 : 0
-  content         = yamlencode(talos_machine_secrets.this.client_configuration)
+  count = var.talosconfig_path != null ? 1 : 0
+  content = yamlencode({
+    context = var.cluster_name
+    contexts = {
+      (var.cluster_name) = {
+        endpoints = [for node in var.control_plane : node.host]
+        nodes = concat(
+          [for node in var.control_plane : node.host],
+          [for node in var.workers : node.host]
+        )
+        ca  = talos_machine_secrets.this.client_configuration.ca_certificate
+        crt = talos_machine_secrets.this.client_configuration.client_certificate
+        key = talos_machine_secrets.this.client_configuration.client_key
+      }
+    }
+  })
   filename        = var.talosconfig_path
   file_permission = "0600"
 }

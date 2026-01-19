@@ -49,3 +49,16 @@ variable "preset" {
     error_message = "Preset must be 'none', 'longhorn', 'longhorn-nfs', 'qemu', or 'full'."
   }
 }
+
+# SBC Overlay configuration
+variable "sbc_overlay" {
+  description = "SBC overlay name for single-board computers (e.g., 'turingrk1', 'rpi_generic', 'rock5b'). Required for SBC hardware support."
+  type        = string
+  default     = null
+}
+
+variable "sbc_overlay_image" {
+  description = "SBC overlay image name (e.g., 'siderolabs/sbc-rockchip'). If not specified, auto-detected from overlay name."
+  type        = string
+  default     = null
+}

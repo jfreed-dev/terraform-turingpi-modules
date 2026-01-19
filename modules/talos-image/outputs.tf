@@ -37,3 +37,13 @@ output "download_command" {
   description = "curl command to download the image"
   value       = local.schematic_id != null ? "curl -LO ${local.image_base_url}/${var.platform}-${var.architecture}.raw.xz" : null
 }
+
+output "sbc_overlay" {
+  description = "SBC overlay name (if configured)"
+  value       = var.sbc_overlay
+}
+
+output "sbc_overlay_image" {
+  description = "SBC overlay image (if configured)"
+  value       = local.resolved_overlay_image
+}

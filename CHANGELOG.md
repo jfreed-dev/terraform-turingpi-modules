@@ -7,25 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.9] - 2026-01-19
+
 ### Added
+- **talos-image module**: SBC overlay support for single-board computers
+  - New `sbc_overlay` variable for board-specific overlays (turingrk1, rpi_generic, rock5b, etc.)
+  - Auto-detection of overlay images from overlay name
+  - Supports 16+ SBC boards across Rockchip, Raspberry Pi, Jetson, and Allwinner families
+- **talos-cluster module**: Added `talosconfig_path` output
+- **talos-wipe.sh**: Added `--yes` / `-y` flag for non-interactive automation
 - **scripts/find-armbian-image.sh** - Find and download Armbian images for Turing RK1 from GitHub releases
-  - Lists all available images with `--list`
-  - Downloads images with `--download`
-  - Generates Armbian autoconfig files for first-boot setup with `--autoconfig`
-  - SSH public key setup with `--ssh-key` for passwordless access
-  - Static IP configuration with `--static-ip`, `--gateway`, `--netmask`, `--dns`
+- **test/addon-test/** - Comprehensive addon module test configuration
+- **test/provider-test/** - Provider data source test configuration
 
 ### Fixed
-- Shellcheck SC2002 warnings in helper scripts (replaced `cat file | cmd` with `cmd < file`)
+- **talos-cluster module**: Fixed talosconfig output format - now generates proper YAML with context, endpoints, nodes (previously output unusable JSON)
+- **talos-wipe.sh**: Removed eMMC wipe attempt - eMMC is system disk and cannot be wiped via talosctl reset
+- Shellcheck SC2002 warnings in helper scripts
 
 ### Changed
-- Enhanced docs/WORKFLOWS.md with comprehensive K3s deployment steps
-  - Network planning section with DHCP reservation recommendation
-  - Static IP configuration via autoconfig for networks without DHCP reservations
-  - Direct URL flashing via BMC API
-  - Autoconfig generation for automated first-boot setup
-  - Node configuration scripts for password, hostname, SSH keys
-  - K3s prerequisites (open-iscsi, nfs-common) for Longhorn support
+- Enhanced docs/WORKFLOWS.md with comprehensive K3s and Talos deployment steps
+- Updated README version references to ~> 1.3.9
+
+### Verified
+- All addon modules tested on Talos v1.9.2 (Turing RK1 with turingrk1 overlay)
+  - metallb: L2 mode with IP pool 10.10.88.80-89
+  - ingress-nginx: LoadBalancer service on 10.10.88.80
+  - cert-manager: Self-signed CA and ClusterIssuers ready
+  - longhorn: StorageClass created with NVMe storage class
+  - monitoring: Prometheus + Grafana with persistent storage
+  - portainer: Agent accessible on 10.10.88.81:9001
+- Talos Image Factory integration with SBC overlays verified
 
 ## [1.3.8] - 2026-01-19
 

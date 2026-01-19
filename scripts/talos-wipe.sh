@@ -13,9 +13,9 @@
 #   -p, --password PASS       BMC password (default: turing, or TURINGPI_PASSWORD env)
 #   -d, --disks DEVICES       Comma-separated user disks to wipe (default: /dev/nvme0n1)
 #   --no-nvme                 Skip NVMe wipe
-#   --no-emmc                 Skip eMMC wipe (eMMC wiped by default)
 #   --clean-terraform         Also clean terraform state files
 #   --force-power-off         Force power off via BMC if graceful shutdown fails
+#   --yes, -y                 Skip interactive confirmation (for automation)
 #   --log FILE                Log output to file
 #   --dry-run                 Show commands without executing
 #   -h, --help                Show this help message
@@ -38,11 +38,10 @@ BMC_IP="${TURINGPI_ENDPOINT:-}"
 BMC_USER="${TURINGPI_USERNAME:-}"
 BMC_PASSWORD="${TURINGPI_PASSWORD:-}"
 USER_DISKS="/dev/nvme0n1"
-EMMC_DEVICE="/dev/mmcblk0"
 WIPE_NVME=true
-WIPE_EMMC=true
 CLEAN_TERRAFORM=false
 FORCE_POWER_OFF=false
+SKIP_CONFIRM=false
 LOG_FILE=""
 DRY_RUN=false
 
@@ -117,9 +116,9 @@ while [[ $# -gt 0 ]]; do
         -p|--password) BMC_PASSWORD="$2"; shift 2 ;;
         -d|--disks) USER_DISKS="$2"; shift 2 ;;
         --no-nvme) WIPE_NVME=false; shift ;;
-        --no-emmc) WIPE_EMMC=false; shift ;;
         --clean-terraform) CLEAN_TERRAFORM=true; shift ;;
         --force-power-off) FORCE_POWER_OFF=true; shift ;;
+        --yes|-y) SKIP_CONFIRM=true; shift ;;
         --log) LOG_FILE="$2"; shift 2 ;;
         --dry-run) DRY_RUN=true; shift ;;
         -h|--help) show_help ;;
@@ -282,7 +281,8 @@ echo ""
 echo "Data to be PERMANENTLY DESTROYED:"
 echo "  • Talos system partitions (STATE, EPHEMERAL)"
 [[ "$WIPE_NVME" == "true" ]] && echo -e "  ${RED}• NVMe drives: $USER_DISKS${NC}"
-[[ "$WIPE_EMMC" == "true" ]] && echo -e "  ${RED}• eMMC boot drives: $EMMC_DEVICE${NC}"
+echo ""
+echo -e "${YELLOW}Note: eMMC is system disk and cannot be wiped via talosctl reset${NC}"
 echo ""
 [[ "$CLEAN_TERRAFORM" == "true" ]] && echo "Terraform cleanup: enabled"
 [[ "$FORCE_POWER_OFF" == "true" ]] && echo "Force power off: enabled"
@@ -290,12 +290,9 @@ echo ""
 [[ "$DRY_RUN" == "true" ]] && echo -e "${YELLOW}DRY RUN MODE - No changes will be made${NC}"
 echo ""
 
-# Confirm before proceeding
-if [[ "$DRY_RUN" != "true" ]]; then
+# Confirm before proceeding (unless --yes flag or dry-run)
+if [[ "$DRY_RUN" != "true" && "$SKIP_CONFIRM" != "true" ]]; then
     echo -e "${RED}This will PERMANENTLY DESTROY ALL DATA on these nodes!${NC}"
-    if [[ "$WIPE_EMMC" == "true" ]]; then
-        echo -e "${RED}Nodes will be UNBOOTABLE until re-flashed via BMC!${NC}"
-    fi
     echo ""
     read -p "Type 'DESTROY' to confirm: " confirm
     if [[ "$confirm" != "DESTROY" ]]; then
@@ -317,16 +314,12 @@ if [[ -f "$TALOSCONFIG" ]]; then
     WIPE_CMD+=" --system-labels-to-wipe STATE --system-labels-to-wipe EPHEMERAL"
 
     # Add NVMe disks if enabled
+    # Note: eMMC is system disk and cannot be wiped via talosctl reset
     if [[ "$WIPE_NVME" == "true" && -n "$USER_DISKS" ]]; then
         IFS=',' read -ra DISK_ARRAY <<< "$USER_DISKS"
         for disk in "${DISK_ARRAY[@]}"; do
             WIPE_CMD+=" --user-disks-to-wipe $disk"
         done
-    fi
-
-    # Add eMMC disk if enabled
-    if [[ "$WIPE_EMMC" == "true" && -n "$EMMC_DEVICE" ]]; then
-        WIPE_CMD+=" --user-disks-to-wipe $EMMC_DEVICE"
     fi
 
     # Don't reboot - we want to shutdown
