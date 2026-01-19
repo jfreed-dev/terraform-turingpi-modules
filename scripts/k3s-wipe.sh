@@ -97,10 +97,10 @@ load_credentials() {
 
     # Try individual files
     if [[ -z "$BMC_USER" && -f "$secrets_dir/turingpi-bmc-user" ]]; then
-        BMC_USER=$(cat "$secrets_dir/turingpi-bmc-user" | tr -d '\n')
+        BMC_USER=$(tr -d '\n' < "$secrets_dir/turingpi-bmc-user")
     fi
     if [[ -z "$BMC_PASSWORD" && -f "$secrets_dir/turingpi-bmc-password" ]]; then
-        BMC_PASSWORD=$(cat "$secrets_dir/turingpi-bmc-password" | tr -d '\n')
+        BMC_PASSWORD=$(tr -d '\n' < "$secrets_dir/turingpi-bmc-password")
     fi
 
     # Use SSH key from secrets if default doesn't exist
