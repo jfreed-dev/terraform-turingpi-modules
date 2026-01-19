@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - SSH public key setup with `--ssh-key` for passwordless access
   - Static IP configuration with `--static-ip`, `--gateway`, `--netmask`, `--dns`
 
+### Fixed
+- Shellcheck SC2002 warnings in helper scripts (replaced `cat file | cmd` with `cmd < file`)
+
 ### Changed
 - Enhanced docs/WORKFLOWS.md with comprehensive K3s deployment steps
   - Network planning section with DHCP reservation recommendation
