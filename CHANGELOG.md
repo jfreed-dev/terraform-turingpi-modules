@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.8] - 2026-01-19
+
+### Changed
+- Wipe scripts now wipe both NVMe and eMMC drives by default
+- Added prominent warning box showing all data to be destroyed
+- Changed confirmation from 'yes' to 'DESTROY' for safety
+- Added `--no-emmc` flag to skip eMMC wipe if needed
+
 ## [1.3.7] - 2026-01-19
 
 ### Fixed
@@ -192,7 +200,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **metallb addon** - MetalLB load balancer
 - **ingress-nginx addon** - NGINX Ingress controller
 
-[Unreleased]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.7...HEAD
+[Unreleased]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.8...HEAD
+[1.3.8]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.7...v1.3.8
 [1.3.7]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.6...v1.3.7
 [1.3.6]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.5...v1.3.6
 [1.3.5]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.4...v1.3.5
