@@ -110,3 +110,20 @@ variable "ingress_annotations" {
   type        = map(string)
   default     = {}
 }
+
+variable "privileged_namespace" {
+  description = "Apply privileged PodSecurity labels to namespace (required for Talos Linux)"
+  type        = bool
+  default     = true
+}
+
+variable "talos_extensions_installed" {
+  description = "Acknowledge that required Talos extensions are installed (iscsi-tools, util-linux-tools). Set to true only after flashing nodes with a custom Talos image that includes these extensions. See README for Image Factory instructions."
+  type        = bool
+  default     = null
+
+  validation {
+    condition     = var.talos_extensions_installed != false
+    error_message = "Longhorn requires Talos extensions (iscsi-tools, util-linux-tools). Build a custom image with these extensions using factory.talos.dev, flash your nodes, then set talos_extensions_installed = true."
+  }
+}

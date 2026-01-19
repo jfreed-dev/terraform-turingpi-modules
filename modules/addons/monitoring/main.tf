@@ -74,8 +74,8 @@ locals {
       adminPassword = var.grafana_admin_password
 
       persistence = {
-        enabled          = var.grafana_persistence_enabled
-        storageClassName = var.storage_class
+        enabled          = var.persistence_enabled && var.grafana_persistence_enabled
+        storageClassName = var.persistence_enabled ? var.storage_class : ""
         size             = var.grafana_storage_size
       }
 
@@ -100,20 +100,6 @@ locals {
           retention     = var.prometheus_retention
           retentionSize = var.prometheus_retention_size
 
-          storageSpec = {
-            volumeClaimTemplate = {
-              spec = {
-                storageClassName = var.storage_class
-                accessModes      = ["ReadWriteOnce"]
-                resources = {
-                  requests = {
-                    storage = var.prometheus_storage_size
-                  }
-                }
-              }
-            }
-          }
-
           resources = {
             requests = {
               memory = var.prometheus_memory_request
@@ -128,6 +114,22 @@ locals {
           podMonitorSelectorNilUsesHelmValues     = false
           serviceMonitorSelectorNilUsesHelmValues = false
         },
+        # Only configure storage if persistence is enabled
+        var.persistence_enabled ? {
+          storageSpec = {
+            volumeClaimTemplate = {
+              spec = {
+                storageClassName = var.storage_class
+                accessModes      = ["ReadWriteOnce"]
+                resources = {
+                  requests = {
+                    storage = var.prometheus_storage_size
+                  }
+                }
+              }
+            }
+          }
+        } : {},
         length(local.additional_scrape_configs) > 0 ? {
           additionalScrapeConfigs = local.additional_scrape_configs
         } : {}
@@ -140,7 +142,7 @@ locals {
 
       ingress = local.alertmanager_ingress
 
-      alertmanagerSpec = {
+      alertmanagerSpec = var.persistence_enabled ? {
         storage = {
           volumeClaimTemplate = {
             spec = {
@@ -154,7 +156,7 @@ locals {
             }
           }
         }
-      }
+      } : {}
     }
 
     # Node Exporter
@@ -209,15 +211,35 @@ locals {
   })
 }
 
+# Create namespace with PodSecurity labels (required for node-exporter on Talos/PSA-enabled clusters)
+resource "kubectl_manifest" "namespace" {
+  count = var.privileged_namespace ? 1 : 0
+
+  yaml_body = yamlencode({
+    apiVersion = "v1"
+    kind       = "Namespace"
+    metadata = {
+      name = var.namespace
+      labels = {
+        "pod-security.kubernetes.io/enforce" = "privileged"
+        "pod-security.kubernetes.io/audit"   = "privileged"
+        "pod-security.kubernetes.io/warn"    = "privileged"
+      }
+    }
+  })
+}
+
 resource "helm_release" "kube_prometheus_stack" {
   name             = "kube-prometheus-stack"
   repository       = "https://prometheus-community.github.io/helm-charts"
   chart            = "kube-prometheus-stack"
   version          = var.chart_version
   namespace        = var.namespace
-  create_namespace = true
+  create_namespace = !var.privileged_namespace
   wait             = true
   timeout          = var.timeout
+
+  depends_on = [kubectl_manifest.namespace]
 
   values = [local.values]
 }

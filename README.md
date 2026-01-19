@@ -13,6 +13,7 @@ Reusable Terraform modules for Turing Pi cluster provisioning and management.
 | Module | Description |
 |--------|-------------|
 | [flash-nodes](./modules/flash-nodes) | Flash firmware to Turing Pi nodes |
+| [talos-image](./modules/talos-image) | Generate Talos images with extensions (Longhorn support) |
 | [talos-cluster](./modules/talos-cluster) | Deploy Talos Linux Kubernetes cluster |
 | [k3s-cluster](./modules/k3s-cluster) | Deploy K3s Kubernetes cluster on Armbian |
 
@@ -147,6 +148,44 @@ module "portainer" {
 | [talos-full-stack](./examples/talos-full-stack) | Complete Talos cluster with all addons |
 | [k3s-full-stack](./examples/k3s-full-stack) | Complete K3s cluster with all addons |
 
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [WORKFLOWS.md](./docs/WORKFLOWS.md) | Complete cluster lifecycle workflows with flowcharts |
+| [ARCHITECTURE.md](./docs/ARCHITECTURE.md) | Module architecture and dependency diagrams |
+
+## Helper Scripts
+
+Helper scripts for cluster lifecycle management are provided in the `scripts/` directory:
+
+| Script | Description |
+|--------|-------------|
+| [`cluster-preflight.sh`](./scripts/cluster-preflight.sh) | Pre-deployment validation checks |
+| [`talos-wipe.sh`](./scripts/talos-wipe.sh) | Wipe and shutdown Talos cluster |
+| [`k3s-wipe.sh`](./scripts/k3s-wipe.sh) | Wipe and shutdown K3s cluster |
+
+All scripts support:
+- `--dry-run` mode for safe testing
+- Environment variables (`TURINGPI_ENDPOINT`, `TURINGPI_USERNAME`, `TURINGPI_PASSWORD`)
+- Credential files in `~/.secrets/`
+- `--force-power-off` via BMC API
+- `--clean-terraform` for state file cleanup
+- `--log FILE` for logging to file
+
+Example usage:
+
+```bash
+# Pre-flight checks
+./scripts/cluster-preflight.sh -t talos -n 10.10.88.73,10.10.88.74,10.10.88.75,10.10.88.76 -b 10.10.88.70
+
+# Wipe Talos cluster with terraform cleanup
+./scripts/talos-wipe.sh -n 10.10.88.73,10.10.88.74,10.10.88.75,10.10.88.76 -b 10.10.88.70 --clean-terraform --force-power-off
+
+# Wipe K3s cluster
+./scripts/k3s-wipe.sh -n 10.10.88.74,10.10.88.75,10.10.88.76 -b 10.10.88.70 --clean-terraform --force-power-off
+```
+
 ## Talos vs K3s
 
 | Feature | Talos | K3s (Armbian) |
@@ -156,6 +195,27 @@ module "portainer" {
 | Access | talosctl | SSH |
 | Customization | Limited (secure) | Full Linux |
 | Best for | Production, security-focused | Development, flexibility |
+
+### Addon Module Configuration by Platform
+
+| Setting | Talos | K3s/Armbian |
+|---------|-------|-------------|
+| `privileged_namespace` | `true` (PSA enforced) | `false` (PSA not enforced) |
+| `talos_extensions_installed` | `true` (after custom image) | `true` (after `apt install open-iscsi`) |
+| Longhorn prerequisites | Custom Talos image with extensions | `apt install open-iscsi nfs-common` |
+
+### Storage Considerations (32GB eMMC)
+
+Longhorn reserves ~30% of disk space. For eMMC-constrained nodes:
+
+```hcl
+module "monitoring" {
+  source = "jfreed-dev/modules/turingpi//modules/addons/monitoring"
+
+  grafana_admin_password  = var.grafana_password
+  prometheus_storage_size = "10Gi"  # Reduced from default 20Gi
+}
+```
 
 ## Requirements
 

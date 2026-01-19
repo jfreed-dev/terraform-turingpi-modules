@@ -29,6 +29,81 @@ module "longhorn" {
 }
 ```
 
+## Prerequisites
+
+### Talos Linux
+
+When running on Talos Linux, Longhorn requires system extensions that are not included in the default image:
+
+| Extension | Required For | Purpose |
+|-----------|--------------|---------|
+| `siderolabs/iscsi-tools` | **Required** | iSCSI initiator for distributed block storage |
+| `siderolabs/util-linux-tools` | **Required** | Filesystem utilities (blkid, lsblk, etc.) |
+| `siderolabs/nfs-utils` | Optional | NFSv3 file locking support for RWX volumes |
+
+Build a custom Talos image with these extensions using the [Talos Image Factory](https://factory.talos.dev):
+
+```bash
+# Create a schematic with required extensions
+curl -X POST https://factory.talos.dev/schematics \
+  -H "Content-Type: application/yaml" \
+  --data-binary @- << 'EOF'
+customization:
+  systemExtensions:
+    officialExtensions:
+      - siderolabs/iscsi-tools
+      - siderolabs/util-linux-tools
+EOF
+
+# Download the image for ARM64 (e.g., Turing RK1)
+# Replace {SCHEMATIC_ID} with the returned ID and {VERSION} with Talos version
+curl -LO "https://factory.talos.dev/image/{SCHEMATIC_ID}/{VERSION}/metal-arm64.raw.xz"
+```
+
+**Pre-built Schematic ID** (iscsi-tools + util-linux-tools):
+```
+613e1592b2da41ae5e265e8789429f22e121aab91cb4deb6bc3c0b6262961245
+```
+
+### Standard Kubernetes (K3s, K8s)
+
+Most standard Kubernetes distributions include the required tools. However, some base images (like Armbian) may need packages installed:
+
+**Debian/Ubuntu/Armbian:**
+```bash
+apt-get update && apt-get install -y open-iscsi nfs-common
+systemctl enable --now iscsid
+```
+
+**RHEL/CentOS/Rocky:**
+```bash
+yum install -y iscsi-initiator-utils nfs-utils
+systemctl enable --now iscsid
+```
+
+### Storage Capacity Planning
+
+Longhorn reserves approximately 30% of disk space by default. On nodes with limited storage (e.g., 32GB eMMC), this can significantly reduce schedulable capacity:
+
+| Disk Size | Reserved (~30%) | Schedulable |
+|-----------|-----------------|-------------|
+| 32GB      | ~9.6GB          | ~22GB       |
+| 64GB      | ~19.2GB         | ~45GB       |
+| 128GB     | ~38.4GB         | ~90GB       |
+
+**Tip:** For eMMC-constrained nodes, consider:
+- Reducing `prometheus_storage_size` to 10Gi or less
+- Using `default_replica_count = 1` for non-critical workloads
+- Adding NVMe storage and using disk selectors
+
+### Namespace Security
+
+On clusters with Pod Security Admission enabled, the `longhorn-system` namespace requires privileged access:
+
+```bash
+kubectl label namespace longhorn-system pod-security.kubernetes.io/enforce=privileged --overwrite
+```
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
@@ -42,8 +117,8 @@ module "longhorn" {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_helm"></a> [helm](#provider\_helm) | >= 2.0 |
-| <a name="provider_kubectl"></a> [kubectl](#provider\_kubectl) | >= 1.14 |
+| <a name="provider_helm"></a> [helm](#provider\_helm) | 3.1.1 |
+| <a name="provider_kubectl"></a> [kubectl](#provider\_kubectl) | 1.19.0 |
 
 ## Inputs
 
@@ -58,10 +133,15 @@ module "longhorn" {
 | <a name="input_ingress_annotations"></a> [ingress\_annotations](#input\_ingress\_annotations) | Additional annotations for Longhorn Ingress | `map(string)` | `{}` | no |
 | <a name="input_ingress_enabled"></a> [ingress\_enabled](#input\_ingress\_enabled) | Enable Ingress for Longhorn UI | `bool` | `false` | no |
 | <a name="input_ingress_host"></a> [ingress\_host](#input\_ingress\_host) | Hostname for Longhorn UI Ingress | `string` | `"longhorn.local"` | no |
+| <a name="input_manager_resources"></a> [manager\_resources](#input\_manager\_resources) | Resource requests/limits for Longhorn manager | <pre>object({<br/>    requests = optional(object({<br/>      cpu    = optional(string, "100m")<br/>      memory = optional(string, "128Mi")<br/>    }), {})<br/>    limits = optional(object({<br/>      cpu    = optional(string, "500m")<br/>      memory = optional(string, "512Mi")<br/>    }), {})<br/>  })</pre> | `{}` | no |
+| <a name="input_namespace"></a> [namespace](#input\_namespace) | Kubernetes namespace for Longhorn | `string` | `"longhorn-system"` | no |
 | <a name="input_nvme_replica_count"></a> [nvme\_replica\_count](#input\_nvme\_replica\_count) | Replica count for NVMe storage class (typically lower for performance) | `number` | `2` | no |
+| <a name="input_privileged_namespace"></a> [privileged\_namespace](#input\_privileged\_namespace) | Apply privileged PodSecurity labels to namespace (required for Talos Linux) | `bool` | `true` | no |
 | <a name="input_set_default_storage_class"></a> [set\_default\_storage\_class](#input\_set\_default\_storage\_class) | Set Longhorn as the default storage class | `bool` | `true` | no |
 | <a name="input_set_nvme_as_default"></a> [set\_nvme\_as\_default](#input\_set\_nvme\_as\_default) | Set NVMe storage class as default instead of standard Longhorn | `bool` | `false` | no |
+| <a name="input_talos_extensions_installed"></a> [talos\_extensions\_installed](#input\_talos\_extensions\_installed) | Acknowledge that required Talos extensions are installed (iscsi-tools, util-linux-tools). Set to true only after flashing nodes with a custom Talos image that includes these extensions. See README for Image Factory instructions. | `bool` | `null` | no |
 | <a name="input_timeout"></a> [timeout](#input\_timeout) | Helm install timeout in seconds | `number` | `600` | no |
+| <a name="input_ui_replicas"></a> [ui\_replicas](#input\_ui\_replicas) | Number of Longhorn UI replicas | `number` | `1` | no |
 
 ## Outputs
 

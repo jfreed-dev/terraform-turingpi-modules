@@ -37,3 +37,18 @@ output "longhorn_ui" {
   description = "Longhorn UI access command"
   value       = "kubectl port-forward -n longhorn-system svc/longhorn-frontend 8080:80"
 }
+
+output "talos_image_url" {
+  description = "Talos image URL used for flashing"
+  value       = module.talos_image.image_url
+}
+
+output "talos_installer_url" {
+  description = "Talos installer URL for upgrades"
+  value       = module.talos_image.installer_url
+}
+
+output "talos_extensions" {
+  description = "Extensions included in the Talos image"
+  value       = module.talos_image.extensions
+}

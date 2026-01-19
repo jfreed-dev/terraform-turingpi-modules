@@ -22,6 +22,18 @@ variable "storage_class" {
   default     = "longhorn"
 }
 
+variable "persistence_enabled" {
+  description = "Enable persistent storage for Prometheus, Grafana, and Alertmanager. Set to false for ephemeral deployments (testing, Talos without storage)"
+  type        = bool
+  default     = true
+}
+
+variable "privileged_namespace" {
+  description = "Apply privileged PodSecurity labels to namespace (required for node-exporter on Talos/PSA-enabled clusters)"
+  type        = bool
+  default     = true
+}
+
 # Grafana Configuration
 variable "grafana_enabled" {
   description = "Enable Grafana deployment"

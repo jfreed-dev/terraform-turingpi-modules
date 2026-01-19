@@ -17,10 +17,23 @@ variable "turingpi_password" {
   sensitive   = true
 }
 
-# Firmware configuration
-variable "talos_firmware" {
-  description = "Path to Talos firmware image"
+# Talos configuration
+variable "talos_version" {
+  description = "Talos version to deploy (e.g., 'v1.9.2')"
   type        = string
+  default     = "v1.9.2"
+}
+
+variable "talos_architecture" {
+  description = "Target architecture for Talos image"
+  type        = string
+  default     = "arm64"
+}
+
+variable "talos_firmware" {
+  description = "Path to Talos firmware image (optional - if not set, uses talos-image module to generate URL)"
+  type        = string
+  default     = null
 }
 
 # Cluster configuration

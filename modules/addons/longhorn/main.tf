@@ -37,15 +37,35 @@ locals {
   })
 }
 
+# Create namespace with PodSecurity labels (required for Talos and PSA-enabled clusters)
+resource "kubectl_manifest" "namespace" {
+  count = var.privileged_namespace ? 1 : 0
+
+  yaml_body = yamlencode({
+    apiVersion = "v1"
+    kind       = "Namespace"
+    metadata = {
+      name = var.namespace
+      labels = {
+        "pod-security.kubernetes.io/enforce" = "privileged"
+        "pod-security.kubernetes.io/audit"   = "privileged"
+        "pod-security.kubernetes.io/warn"    = "privileged"
+      }
+    }
+  })
+}
+
 resource "helm_release" "longhorn" {
   name             = "longhorn"
   repository       = "https://charts.longhorn.io"
   chart            = "longhorn"
   version          = var.chart_version
   namespace        = var.namespace
-  create_namespace = true
+  create_namespace = !var.privileged_namespace
   wait             = true
   timeout          = var.timeout
+
+  depends_on = [kubectl_manifest.namespace]
 
   values = [local.values]
 }

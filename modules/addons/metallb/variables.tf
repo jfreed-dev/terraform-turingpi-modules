@@ -56,3 +56,9 @@ variable "speaker_resources" {
   })
   default = {}
 }
+
+variable "privileged_namespace" {
+  description = "Apply privileged PodSecurity labels to namespace (required for Talos Linux)"
+  type        = bool
+  default     = true
+}

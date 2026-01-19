@@ -39,8 +39,8 @@ module "metallb" {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_helm"></a> [helm](#provider\_helm) | >= 2.0 |
-| <a name="provider_kubectl"></a> [kubectl](#provider\_kubectl) | >= 1.14 |
+| <a name="provider_helm"></a> [helm](#provider\_helm) | 3.1.1 |
+| <a name="provider_kubectl"></a> [kubectl](#provider\_kubectl) | 1.19.0 |
 
 ## Inputs
 
@@ -48,7 +48,11 @@ module "metallb" {
 |------|-------------|------|---------|:--------:|
 | <a name="input_ip_range"></a> [ip\_range](#input\_ip\_range) | IP range for LoadBalancer services (e.g., 192.168.1.200-192.168.1.220) | `string` | n/a | yes |
 | <a name="input_chart_version"></a> [chart\_version](#input\_chart\_version) | MetalLB Helm chart version | `string` | `"0.14.9"` | no |
+| <a name="input_controller_resources"></a> [controller\_resources](#input\_controller\_resources) | Resource requests/limits for MetalLB controller | <pre>object({<br/>    requests = optional(object({<br/>      cpu    = optional(string, "100m")<br/>      memory = optional(string, "128Mi")<br/>    }), {})<br/>    limits = optional(object({<br/>      cpu    = optional(string, "200m")<br/>      memory = optional(string, "256Mi")<br/>    }), {})<br/>  })</pre> | `{}` | no |
+| <a name="input_namespace"></a> [namespace](#input\_namespace) | Kubernetes namespace for MetalLB | `string` | `"metallb-system"` | no |
 | <a name="input_pool_name"></a> [pool\_name](#input\_pool\_name) | Name of the IP address pool | `string` | `"default-pool"` | no |
+| <a name="input_privileged_namespace"></a> [privileged\_namespace](#input\_privileged\_namespace) | Apply privileged PodSecurity labels to namespace (required for Talos Linux) | `bool` | `true` | no |
+| <a name="input_speaker_resources"></a> [speaker\_resources](#input\_speaker\_resources) | Resource requests/limits for MetalLB speaker | <pre>object({<br/>    requests = optional(object({<br/>      cpu    = optional(string, "100m")<br/>      memory = optional(string, "128Mi")<br/>    }), {})<br/>    limits = optional(object({<br/>      cpu    = optional(string, "200m")<br/>      memory = optional(string, "256Mi")<br/>    }), {})<br/>  })</pre> | `{}` | no |
 | <a name="input_timeout"></a> [timeout](#input\_timeout) | Helm install timeout in seconds | `number` | `300` | no |
 
 ## Outputs

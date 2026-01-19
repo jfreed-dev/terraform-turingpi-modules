@@ -148,6 +148,112 @@ module "longhorn" {
 }
 ```
 
+## Talos System Extensions
+
+Some addon modules require Talos system extensions. Without these extensions, certain features won't work:
+
+| Addon Module | Required Extension | Purpose |
+|--------------|-------------------|---------|
+| `longhorn` | `siderolabs/iscsi-tools` | iSCSI support for distributed storage |
+| `longhorn` (NFS) | `siderolabs/nfs-utils` | NFSv3 file locking support |
+| VMs | `siderolabs/qemu-guest-agent` | QEMU guest agent service |
+
+### Building Talos Images with Extensions
+
+Use the [Talos Image Factory](https://factory.talos.dev) to create custom images with extensions:
+
+```bash
+# Create a schematic with required extensions
+curl -X POST https://factory.talos.dev/schematics \
+  -H "Content-Type: application/yaml" \
+  --data-binary @- << 'EOF'
+customization:
+  systemExtensions:
+    officialExtensions:
+      - siderolabs/iscsi-tools
+      - siderolabs/util-linux-tools
+EOF
+
+# Response: {"id":"613e1592b2da41ae5e265e8789429f22e121aab91cb4deb6bc3c0b6262961245"}
+
+# Download the image for ARM64 (Turing RK1)
+curl -LO "https://factory.talos.dev/image/613e1592b2da41ae5e265e8789429f22e121aab91cb4deb6bc3c0b6262961245/v1.12.1/metal-arm64.raw.xz"
+```
+
+### Pre-built Schematic IDs
+
+| Extensions | Schematic ID |
+|------------|--------------|
+| iscsi-tools + util-linux-tools | `613e1592b2da41ae5e265e8789429f22e121aab91cb4deb6bc3c0b6262961245` |
+
+Use these IDs to download images directly:
+```
+https://factory.talos.dev/image/{SCHEMATIC_ID}/{TALOS_VERSION}/metal-arm64.raw.xz
+```
+
+### Checking Installed Extensions
+
+```bash
+talosctl get extensions --nodes <NODE_IP>
+```
+
+## Resetting Talos Nodes
+
+### Automated Wipe Script
+
+Use the included wipe script to cleanly wipe all drives, shutdown nodes, and verify power off via the TuringPi BMC:
+
+```bash
+# Dry run (shows commands without executing)
+./scripts/talos-wipe.sh \
+  --talosconfig ./talosconfig \
+  --nodes 10.10.88.74,10.10.88.75,10.10.88.76 \
+  --bmc 10.10.88.70 \
+  --dry-run
+
+# Execute wipe workflow
+./scripts/talos-wipe.sh \
+  --talosconfig ./talosconfig \
+  --nodes 10.10.88.74,10.10.88.75,10.10.88.76 \
+  --bmc 10.10.88.70
+
+# Skip NVMe wipe (only wipe system partitions)
+./scripts/talos-wipe.sh \
+  --talosconfig ./talosconfig \
+  --nodes 10.10.88.74,10.10.88.75,10.10.88.76 \
+  --bmc 10.10.88.70 \
+  --no-nvme
+```
+
+The script will:
+1. Wipe STATE and EPHEMERAL partitions
+2. Optionally wipe user disks (NVMe)
+3. Shutdown all nodes
+4. Verify power off via BMC API
+
+### Manual Commands
+
+```bash
+# Reset and return to maintenance mode (wipes cluster state)
+talosctl reset --nodes <NODE_IP> --graceful=false --reboot \
+  --system-labels-to-wipe STATE \
+  --system-labels-to-wipe EPHEMERAL
+
+# Also wipe user data disks (NVMe, etc.)
+talosctl reset --nodes <NODE_IP> --graceful=false --reboot \
+  --system-labels-to-wipe STATE \
+  --system-labels-to-wipe EPHEMERAL \
+  --user-disks-to-wipe /dev/nvme0n1
+
+# Reset multiple nodes at once
+talosctl reset --nodes 10.10.88.74,10.10.88.75,10.10.88.76 \
+  --graceful=false --reboot \
+  --system-labels-to-wipe STATE \
+  --system-labels-to-wipe EPHEMERAL
+```
+
+**Note:** After reset, nodes enter maintenance mode. To install a different OS, re-flash via the TuringPi BMC.
+
 ## Prerequisites
 
 Nodes must be pre-flashed with Talos Linux. Use the [flash-nodes](../flash-nodes) module or the `turingpi_flash` resource.

@@ -36,17 +36,36 @@ provider "turingpi" {
 }
 
 # =============================================================================
+# Talos Image with Extensions (Longhorn support)
+# =============================================================================
+# Generates a custom Talos image URL with iscsi-tools and util-linux-tools
+# extensions required for Longhorn distributed storage.
+
+module "talos_image" {
+  source = "../../modules/talos-image"
+
+  talos_version = var.talos_version
+  architecture  = var.talos_architecture
+  preset        = "longhorn"  # Includes iscsi-tools + util-linux-tools
+}
+
+# =============================================================================
 # Flash Talos to Nodes
 # =============================================================================
+
+locals {
+  # Use provided firmware path or the generated image URL
+  firmware_url = coalesce(var.talos_firmware, module.talos_image.image_url)
+}
 
 module "flash" {
   source = "../../modules/flash-nodes"
 
   nodes = {
-    1 = { firmware = var.talos_firmware }
-    2 = { firmware = var.talos_firmware }
-    3 = { firmware = var.talos_firmware }
-    4 = { firmware = var.talos_firmware }
+    1 = { firmware = local.firmware_url }
+    2 = { firmware = local.firmware_url }
+    3 = { firmware = local.firmware_url }
+    4 = { firmware = local.firmware_url }
   }
 }
 
