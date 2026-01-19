@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.6] - 2026-01-19
+
+### Added
+- **talos-image module** - Generate Talos images with extensions (iscsi-tools, util-linux-tools) for Longhorn support
+- **docs/WORKFLOWS.md** - Complete cluster lifecycle documentation with Mermaid flowcharts for Talos and K3s
+- **scripts/cluster-preflight.sh** - Pre-deployment validation script checking tools, BMC connectivity, node status
+- **scripts/talos-wipe.sh** - Enhanced Talos cluster wipe with env vars, credential files, terraform cleanup, force power-off
+- **scripts/k3s-wipe.sh** - Enhanced K3s cluster wipe with node draining, container cleanup, iptables cleanup
+
+### Changed
+- Updated talos-full-stack example to use talos-image module for automatic image generation
+- Enhanced README with documentation links and helper script examples
+- Added platform-specific configurations to addon modules (Talos vs K3s/Armbian)
+- Added storage capacity planning guidance for eMMC-constrained nodes
+
 ## [1.3.5] - 2026-01-18
 
 ### Added
@@ -170,7 +185,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **metallb addon** - MetalLB load balancer
 - **ingress-nginx addon** - NGINX Ingress controller
 
-[Unreleased]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.3...HEAD
+[Unreleased]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.6...HEAD
+[1.3.6]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.5...v1.3.6
+[1.3.5]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.4...v1.3.5
+[1.3.4]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.3...v1.3.4
 [1.3.3]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.2...v1.3.3
 [1.3.2]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.0...v1.3.1
