@@ -164,9 +164,9 @@ Helper scripts for cluster lifecycle management are provided in the `scripts/` d
 | [`cluster-preflight.sh`](./scripts/cluster-preflight.sh) | Pre-deployment validation checks |
 | [`talos-wipe.sh`](./scripts/talos-wipe.sh) | Wipe and shutdown Talos cluster |
 | [`k3s-wipe.sh`](./scripts/k3s-wipe.sh) | Wipe and shutdown K3s cluster |
-| [`find-armbian-image.sh`](./scripts/find-armbian-image.sh) | Find latest Armbian image for Turing RK1 |
+| [`find-armbian-image.sh`](./scripts/find-armbian-image.sh) | Find Armbian images, generate autoconfig for first-boot |
 
-All scripts support:
+**Wipe scripts** (`talos-wipe.sh`, `k3s-wipe.sh`) support:
 - `--dry-run` mode for safe testing
 - Environment variables (`TURINGPI_ENDPOINT`, `TURINGPI_USERNAME`, `TURINGPI_PASSWORD`)
 - Credential files in `~/.secrets/`
@@ -197,6 +197,12 @@ Example usage:
     --root-password "YourPassword" \
     --ssh-key ~/.ssh/id_ed25519.pub \
     --timezone "America/Chicago"
+
+# Generate autoconfig with static IP (when DHCP reservations unavailable)
+./scripts/find-armbian-image.sh --autoconfig first_run.txt \
+    --root-password "YourPassword" \
+    --static-ip "10.10.88.74" \
+    --gateway "10.10.88.1"
 ```
 
 ## Talos vs K3s
