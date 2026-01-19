@@ -54,7 +54,9 @@ NC='\033[0m' # No Color
 log_output() {
     local msg="$1"
     echo -e "$msg"
-    [[ -n "$LOG_FILE" ]] && echo -e "$msg" | sed 's/\x1b\[[0-9;]*m//g' >> "$LOG_FILE"
+    if [[ -n "$LOG_FILE" ]]; then
+        echo -e "$msg" | sed 's/\x1b\[[0-9;]*m//g' >> "$LOG_FILE"
+    fi
 }
 
 log_info() { log_output "${GREEN}[INFO]${NC} $1"; }
@@ -282,7 +284,7 @@ echo ""
 
 # Step: Wipe Talos system partitions
 log_step "Step $STEP: Wiping Talos system partitions (STATE, EPHEMERAL)..."
-((STEP++))
+STEP=$((STEP + 1))
 
 if [[ -f "$TALOSCONFIG" ]]; then
     # Build wipe command
@@ -309,7 +311,7 @@ fi
 
 echo ""
 log_step "Step $STEP: Shutting down nodes..."
-((STEP++))
+STEP=$((STEP + 1))
 
 for node in "${NODE_ARRAY[@]}"; do
     log_info "  Shutting down $node..."
@@ -324,7 +326,7 @@ done
 
 echo ""
 log_step "Step $STEP: Verifying power off via BMC..."
-((STEP++))
+STEP=$((STEP + 1))
 
 sleep 5  # Give nodes time to shutdown
 
@@ -351,7 +353,7 @@ done
 if [[ ${#nodes_still_on[@]} -gt 0 && "$FORCE_POWER_OFF" == "true" ]]; then
     echo ""
     log_step "Step $STEP: Force powering off remaining nodes..."
-    ((STEP++))
+    STEP=$((STEP + 1))
 
     for node_slot in "${nodes_still_on[@]}"; do
         node=$(echo "$node_slot" | cut -d':' -f1)
@@ -374,7 +376,7 @@ fi
 if [[ "$CLEAN_TERRAFORM" == "true" ]]; then
     echo ""
     log_step "Step $STEP: Cleaning Terraform state..."
-    ((STEP++))
+    STEP=$((STEP + 1))
 
     # Look for terraform files in common locations
     terraform_dir=$(dirname "$TALOSCONFIG")

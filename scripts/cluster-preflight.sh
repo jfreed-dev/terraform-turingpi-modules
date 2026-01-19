@@ -90,17 +90,17 @@ CHECKS_WARNED=0
 
 pass_check() {
     log_pass "$1"
-    ((CHECKS_PASSED++))
+    CHECKS_PASSED=$((CHECKS_PASSED + 1))
 }
 
 fail_check() {
     log_fail "$1"
-    ((CHECKS_FAILED++))
+    CHECKS_FAILED=$((CHECKS_FAILED + 1))
 }
 
 warn_check() {
     log_warn "$1"
-    ((CHECKS_WARNED++))
+    CHECKS_WARNED=$((CHECKS_WARNED + 1))
 }
 
 echo "=============================================="

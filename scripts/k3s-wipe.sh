@@ -58,7 +58,9 @@ NC='\033[0m' # No Color
 log_output() {
     local msg="$1"
     echo -e "$msg"
-    [[ -n "$LOG_FILE" ]] && echo -e "$msg" | sed 's/\x1b\[[0-9;]*m//g' >> "$LOG_FILE"
+    if [[ -n "$LOG_FILE" ]]; then
+        echo -e "$msg" | sed 's/\x1b\[[0-9;]*m//g' >> "$LOG_FILE"
+    fi
 }
 
 log_info() { log_output "${GREEN}[INFO]${NC} $1"; }
@@ -309,7 +311,7 @@ echo ""
 
 # Step: Drain nodes from Kubernetes cluster
 log_step "Step $STEP: Draining nodes from Kubernetes cluster..."
-((STEP++))
+STEP=$((STEP + 1))
 
 if [[ -f "$KUBECONFIG_PATH" ]]; then
     for node_ip in "${NODE_ARRAY[@]}"; do
@@ -333,7 +335,7 @@ fi
 
 echo ""
 log_step "Step $STEP: Stopping K3s service on all nodes..."
-((STEP++))
+STEP=$((STEP + 1))
 
 for node in "${NODE_ARRAY[@]}"; do
     log_info "  Stopping K3s on $node..."
@@ -344,7 +346,7 @@ done
 
 echo ""
 log_step "Step $STEP: Wiping K3s data directories..."
-((STEP++))
+STEP=$((STEP + 1))
 
 for node in "${NODE_ARRAY[@]}"; do
     log_info "  Wiping K3s data on $node..."
@@ -364,7 +366,7 @@ done
 if [[ "$WIPE_NVME" == "true" && -n "$USER_DISKS" ]]; then
     echo ""
     log_step "Step $STEP: Wiping user disks (NVMe)..."
-    ((STEP++))
+    STEP=$((STEP + 1))
 
     IFS=',' read -ra DISK_ARRAY <<< "$USER_DISKS"
     for node in "${NODE_ARRAY[@]}"; do
@@ -388,7 +390,7 @@ fi
 if [[ "$WIPE_EMMC" == "true" ]]; then
     echo ""
     log_step "Step $STEP: Wiping eMMC boot drive..."
-    ((STEP++))
+    STEP=$((STEP + 1))
 
     log_warn "This will make nodes unbootable!"
 
@@ -403,7 +405,7 @@ fi
 
 echo ""
 log_step "Step $STEP: Shutting down nodes..."
-((STEP++))
+STEP=$((STEP + 1))
 
 for node in "${NODE_ARRAY[@]}"; do
     log_info "  Shutting down $node..."
@@ -414,7 +416,7 @@ done
 
 echo ""
 log_step "Step $STEP: Verifying power off via BMC..."
-((STEP++))
+STEP=$((STEP + 1))
 
 sleep 10  # Give nodes time to shutdown
 
@@ -441,7 +443,7 @@ done
 if [[ ${#nodes_still_on[@]} -gt 0 && "$FORCE_POWER_OFF" == "true" ]]; then
     echo ""
     log_step "Step $STEP: Force powering off remaining nodes..."
-    ((STEP++))
+    STEP=$((STEP + 1))
 
     for node_slot in "${nodes_still_on[@]}"; do
         node=$(echo "$node_slot" | cut -d':' -f1)
@@ -464,7 +466,7 @@ fi
 if [[ "$CLEAN_TERRAFORM" == "true" ]]; then
     echo ""
     log_step "Step $STEP: Cleaning Terraform state..."
-    ((STEP++))
+    STEP=$((STEP + 1))
 
     # Look for terraform files in common locations
     kubeconfig_dir=$(dirname "$KUBECONFIG_PATH")
