@@ -16,6 +16,10 @@
 #   --hostname NAME         Hostname for autoconfig
 #   --timezone TZ           Timezone for autoconfig (default: UTC)
 #   --ssh-key FILE          SSH public key file to add for passwordless access
+#   --static-ip IP          Static IP address (use with --gateway, --netmask, --dns)
+#   --gateway IP            Gateway IP (required with --static-ip)
+#   --netmask MASK          Netmask (default: 255.255.255.0)
+#   --dns IP                DNS server IP (default: same as gateway)
 #   -h, --help              Show this help message
 
 set -euo pipefail
@@ -31,13 +35,17 @@ ROOT_PASSWORD="1234"
 HOSTNAME=""
 TIMEZONE="UTC"
 SSH_KEY_FILE=""
+STATIC_IP=""
+GATEWAY=""
+NETMASK="255.255.255.0"
+DNS=""
 
 # GitHub API
 REPO="armbian/community"
 API_URL="https://api.github.com/repos/${REPO}/releases"
 
 show_help() {
-    head -22 "$0" | tail -19
+    head -26 "$0" | tail -23
     exit 0
 }
 
@@ -54,6 +62,10 @@ while [[ $# -gt 0 ]]; do
         --hostname) HOSTNAME="$2"; shift 2 ;;
         --timezone) TIMEZONE="$2"; shift 2 ;;
         --ssh-key) SSH_KEY_FILE="$2"; shift 2 ;;
+        --static-ip) STATIC_IP="$2"; shift 2 ;;
+        --gateway) GATEWAY="$2"; shift 2 ;;
+        --netmask) NETMASK="$2"; shift 2 ;;
+        --dns) DNS="$2"; shift 2 ;;
         -h|--help) show_help ;;
         *) echo "Unknown option: $1"; show_help ;;
     esac
@@ -111,6 +123,29 @@ SSHEOF
         echo "  SSH key added from: $SSH_KEY_FILE"
     fi
 
+    # Add static IP configuration if provided
+    if [[ -n "$STATIC_IP" ]]; then
+        if [[ -z "$GATEWAY" ]]; then
+            echo "Error: --gateway is required when using --static-ip"
+            exit 1
+        fi
+        # Default DNS to gateway if not specified
+        if [[ -z "$DNS" ]]; then
+            DNS="$GATEWAY"
+        fi
+        cat >> "$AUTOCONFIG_FILE" << IPEOF
+
+# Static IP Configuration
+# Disables DHCP and sets static network configuration
+FR_net_change_defaults=0
+FR_net_static_enabled=1
+FR_net_static_ip="${STATIC_IP}"
+FR_net_static_gateway="${GATEWAY}"
+FR_net_static_netmask="${NETMASK}"
+FR_net_static_dns="${DNS}"
+IPEOF
+    fi
+
     echo ""
     echo "Autoconfig file created: $AUTOCONFIG_FILE"
     echo ""
@@ -122,6 +157,9 @@ SSHEOF
     fi
     if [[ -n "$SSH_KEY_FILE" ]]; then
         echo "  - SSH key: ${SSH_KEY_FILE}"
+    fi
+    if [[ -n "$STATIC_IP" ]]; then
+        echo "  - Static IP: ${STATIC_IP} (gateway: ${GATEWAY})"
     fi
     echo ""
     echo "To use with existing installation:"

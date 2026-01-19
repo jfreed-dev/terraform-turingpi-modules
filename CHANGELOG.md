@@ -13,9 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Downloads images with `--download`
   - Generates Armbian autoconfig files for first-boot setup with `--autoconfig`
   - SSH public key setup with `--ssh-key` for passwordless access
+  - Static IP configuration with `--static-ip`, `--gateway`, `--netmask`, `--dns`
 
 ### Changed
 - Enhanced docs/WORKFLOWS.md with comprehensive K3s deployment steps
+  - Network planning section with DHCP reservation recommendation
+  - Static IP configuration via autoconfig for networks without DHCP reservations
   - Direct URL flashing via BMC API
   - Autoconfig generation for automated first-boot setup
   - Node configuration scripts for password, hostname, SSH keys

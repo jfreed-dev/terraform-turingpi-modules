@@ -237,6 +237,46 @@ flowchart TD
     style Destroy fill:#ffebee
 ```
 
+### K3s Prerequisites
+
+#### Network Planning: Static IP Addresses
+
+Kubernetes nodes require stable IP addresses. We recommend using **DHCP reservations** (static DHCP) to assign consistent IPs to each node based on MAC address.
+
+**Recommended Approach: DHCP Reservations**
+
+Configure your network's DHCP server to assign fixed IPs to each node's MAC address. Check your:
+- Home router admin interface
+- Dedicated DHCP server (pfSense, OPNsense, Pi-hole, etc.)
+- Enterprise DHCP server
+
+This approach allows nodes to boot normally while always receiving the same IP.
+
+**Alternative: Static IP via Autoconfig**
+
+If DHCP reservations aren't available, configure static IPs using Armbian's first-run script. Add to `/boot/armbian_first_run.txt`:
+
+```bash
+# Static IP configuration (adjust for your network)
+FR_net_change_defaults=0
+FR_net_static_enabled=1
+FR_net_static_ip="10.10.88.74"
+FR_net_static_gateway="10.10.88.1"
+FR_net_static_netmask="255.255.255.0"
+FR_net_static_dns="10.10.88.1"
+```
+
+Or configure manually after first boot via `/etc/network/interfaces` or netplan.
+
+**Example IP Plan:**
+
+| Node | Hostname | IP Address | Role |
+|------|----------|------------|------|
+| 1 | turing-cp1 | 10.10.88.73 | Control Plane |
+| 2 | turing-w1 | 10.10.88.74 | Worker |
+| 3 | turing-w2 | 10.10.88.75 | Worker |
+| 4 | turing-w3 | 10.10.88.76 | Worker |
+
 ### K3s Deployment Steps
 
 #### Step 1: Find and Download Armbian Image
