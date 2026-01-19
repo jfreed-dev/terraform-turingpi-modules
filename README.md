@@ -164,6 +164,7 @@ Helper scripts for cluster lifecycle management are provided in the `scripts/` d
 | [`cluster-preflight.sh`](./scripts/cluster-preflight.sh) | Pre-deployment validation checks |
 | [`talos-wipe.sh`](./scripts/talos-wipe.sh) | Wipe and shutdown Talos cluster |
 | [`k3s-wipe.sh`](./scripts/k3s-wipe.sh) | Wipe and shutdown K3s cluster |
+| [`find-armbian-image.sh`](./scripts/find-armbian-image.sh) | Find latest Armbian image for Turing RK1 |
 
 All scripts support:
 - `--dry-run` mode for safe testing
@@ -184,6 +185,12 @@ Example usage:
 
 # Wipe K3s cluster
 ./scripts/k3s-wipe.sh -n 10.10.88.74,10.10.88.75,10.10.88.76 -b 10.10.88.70 --clean-terraform --force-power-off
+
+# Find and list available Armbian images
+./scripts/find-armbian-image.sh --list
+
+# Find minimal trixie image URL for BMC flash
+./scripts/find-armbian-image.sh -v minimal -r trixie
 ```
 
 ## Talos vs K3s

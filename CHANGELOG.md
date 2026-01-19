@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **scripts/find-armbian-image.sh** - Find and download Armbian images for Turing RK1 from GitHub releases
+  - Lists all available images with `--list`
+  - Downloads images with `--download`
+  - Generates Armbian autoconfig files for first-boot setup with `--autoconfig`
+
 ## [1.3.8] - 2026-01-19
 
 ### Changed
