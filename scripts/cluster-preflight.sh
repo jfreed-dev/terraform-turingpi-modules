@@ -21,10 +21,47 @@ set -euo pipefail
 CLUSTER_TYPE=""
 NODES=""
 BMC_IP=""
-BMC_USER="root"
-BMC_PASSWORD="turing"
+BMC_USER=""
+BMC_PASSWORD=""
 SSH_KEY="$HOME/.ssh/id_rsa"
 TALOSCONFIG="./talosconfig"
+
+# Load credentials from secrets files
+load_credentials() {
+    local secrets_dir="$HOME/.secrets"
+
+    # Try turning-pi-cluster-bmc format first (contains ip, username, password)
+    if [[ -f "$secrets_dir/turning-pi-cluster-bmc" ]]; then
+        if [[ -z "$BMC_USER" ]]; then
+            BMC_USER=$(grep "^username:" "$secrets_dir/turning-pi-cluster-bmc" | cut -d' ' -f2) || true
+        fi
+        if [[ -z "$BMC_PASSWORD" ]]; then
+            BMC_PASSWORD=$(grep "^password:" "$secrets_dir/turning-pi-cluster-bmc" | cut -d' ' -f2) || true
+        fi
+        if [[ -z "$BMC_IP" ]]; then
+            BMC_IP=$(grep "^ip:" "$secrets_dir/turning-pi-cluster-bmc" | cut -d' ' -f2) || true
+        fi
+    fi
+
+    # Try individual files
+    if [[ -z "$BMC_USER" && -f "$secrets_dir/turingpi-bmc-user" ]]; then
+        BMC_USER=$(cat "$secrets_dir/turingpi-bmc-user" | tr -d '\n')
+    fi
+    if [[ -z "$BMC_PASSWORD" && -f "$secrets_dir/turingpi-bmc-password" ]]; then
+        BMC_PASSWORD=$(cat "$secrets_dir/turingpi-bmc-password" | tr -d '\n')
+    fi
+
+    # Use SSH key from secrets if available
+    if [[ -f "$secrets_dir/turningpi-cluster" ]]; then
+        SSH_KEY="$secrets_dir/turningpi-cluster"
+    elif [[ -f "$secrets_dir/turingpi-bmc" ]]; then
+        SSH_KEY="$secrets_dir/turingpi-bmc"
+    fi
+
+    # Apply defaults
+    : "${BMC_USER:=root}"
+    : "${BMC_PASSWORD:=turing}"
+}
 
 # Colors for output
 RED='\033[0;31m'
@@ -59,6 +96,9 @@ while [[ $# -gt 0 ]]; do
         *) log_error "Unknown option: $1"; show_help ;;
     esac
 done
+
+# Load credentials from secrets files (command-line args override)
+load_credentials
 
 # Validate required arguments
 if [[ -z "$CLUSTER_TYPE" ]]; then
