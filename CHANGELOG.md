@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.7] - 2026-01-19
+
+### Fixed
+- Helper scripts bash `set -e` compatibility (STEP increment, log_output function)
+- Scripts now auto-load credentials from `~/.secrets/turning-pi-cluster-bmc` file format
+- Scripts auto-detect SSH key from `~/.secrets/turningpi-cluster`
+
 ## [1.3.6] - 2026-01-19
 
 ### Added
@@ -185,7 +192,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **metallb addon** - MetalLB load balancer
 - **ingress-nginx addon** - NGINX Ingress controller
 
-[Unreleased]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.6...HEAD
+[Unreleased]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.7...HEAD
+[1.3.7]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.6...v1.3.7
 [1.3.6]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.5...v1.3.6
 [1.3.5]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.4...v1.3.5
 [1.3.4]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.3...v1.3.4
