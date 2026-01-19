@@ -14,7 +14,7 @@
 #   -i, --ssh-key PATH        SSH private key path (default: ~/.ssh/id_rsa)
 #   -d, --disks DEVICES       Comma-separated disks to wipe (default: /dev/nvme0n1)
 #   --no-nvme                 Skip NVMe wipe
-#   --wipe-emmc               Also wipe eMMC/boot drive (DANGEROUS)
+#   --no-emmc                 Skip eMMC wipe (eMMC wiped by default)
 #   --clean-terraform         Also clean terraform state files
 #   --force-power-off         Force power off via BMC if graceful shutdown fails
 #   --log FILE                Log output to file
@@ -41,7 +41,7 @@ BMC_PASSWORD="${TURINGPI_PASSWORD:-}"
 SSH_KEY="$HOME/.ssh/id_rsa"
 USER_DISKS="/dev/nvme0n1"
 WIPE_NVME=true
-WIPE_EMMC=false
+WIPE_EMMC=true
 CLEAN_TERRAFORM=false
 FORCE_POWER_OFF=false
 LOG_FILE=""
@@ -128,7 +128,7 @@ while [[ $# -gt 0 ]]; do
         -i|--ssh-key) SSH_KEY="$2"; shift 2 ;;
         -d|--disks) USER_DISKS="$2"; shift 2 ;;
         --no-nvme) WIPE_NVME=false; shift ;;
-        --wipe-emmc) WIPE_EMMC=true; shift ;;
+        --no-emmc) WIPE_EMMC=false; shift ;;
         --clean-terraform) CLEAN_TERRAFORM=true; shift ;;
         --force-power-off) FORCE_POWER_OFF=true; shift ;;
         --log) LOG_FILE="$2"; shift 2 ;;
@@ -292,11 +292,20 @@ echo "=============================================="
 echo "  K3s Cluster Wipe Workflow"
 echo "=============================================="
 echo ""
+echo -e "${RED}╔════════════════════════════════════════════╗${NC}"
+echo -e "${RED}║       ⚠️  WARNING: DATA DESTRUCTION ⚠️       ║${NC}"
+echo -e "${RED}╚════════════════════════════════════════════╝${NC}"
+echo ""
 echo "Nodes to wipe: ${NODE_ARRAY[*]}"
 echo "BMC: $BMC_IP"
 echo "SSH Key: $SSH_KEY"
-[[ "$WIPE_NVME" == "true" ]] && echo "User disks to wipe: $USER_DISKS"
-[[ "$WIPE_EMMC" == "true" ]] && echo -e "${RED}WARNING: eMMC wipe enabled!${NC}"
+echo ""
+echo "Data to be PERMANENTLY DESTROYED:"
+[[ "$WIPE_NVME" == "true" ]] && echo -e "  ${RED}• NVMe drives: $USER_DISKS${NC}"
+[[ "$WIPE_EMMC" == "true" ]] && echo -e "  ${RED}• eMMC boot drives: /dev/mmcblk0${NC}"
+echo "  • K3s data directories"
+echo "  • Kubernetes state and configurations"
+echo ""
 [[ "$CLEAN_TERRAFORM" == "true" ]] && echo "Terraform cleanup: enabled"
 [[ "$FORCE_POWER_OFF" == "true" ]] && echo "Force power off: enabled"
 [[ -n "$LOG_FILE" ]] && echo "Logging to: $LOG_FILE"
@@ -305,20 +314,15 @@ echo ""
 
 # Confirm before proceeding
 if [[ "$DRY_RUN" != "true" ]]; then
+    echo -e "${RED}This will PERMANENTLY DESTROY ALL DATA on these nodes!${NC}"
     if [[ "$WIPE_EMMC" == "true" ]]; then
-        echo -e "${RED}WARNING: You are about to wipe the eMMC boot drive!${NC}"
-        echo -e "${RED}This will make the nodes unbootable until re-flashed!${NC}"
-        read -p "Type 'DESTROY' to confirm: " confirm
-        if [[ "$confirm" != "DESTROY" ]]; then
-            log_warn "Aborted by user"
-            exit 0
-        fi
-    else
-        read -p "This will PERMANENTLY WIPE K3s data and user disks. Continue? (yes/no): " confirm
-        if [[ "$confirm" != "yes" ]]; then
-            log_warn "Aborted by user"
-            exit 0
-        fi
+        echo -e "${RED}Nodes will be UNBOOTABLE until re-flashed via BMC!${NC}"
+    fi
+    echo ""
+    read -p "Type 'DESTROY' to confirm: " confirm
+    if [[ "$confirm" != "DESTROY" ]]; then
+        log_warn "Aborted by user"
+        exit 0
     fi
 fi
 
@@ -405,10 +409,8 @@ fi
 
 if [[ "$WIPE_EMMC" == "true" ]]; then
     echo ""
-    log_step "Step $STEP: Wiping eMMC boot drive..."
+    log_step "Step $STEP: Wiping eMMC boot drive (/dev/mmcblk0)..."
     STEP=$((STEP + 1))
-
-    log_warn "This will make nodes unbootable!"
 
     for node in "${NODE_ARRAY[@]}"; do
         log_info "  Wiping eMMC on $node..."
