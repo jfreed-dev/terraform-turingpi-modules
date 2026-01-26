@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.10] - 2026-01-25
+
+### Changed
+- Synchronized release with terraform-provider-turingpi v1.3.10
+- Provider fix: BMC firmware 2.0.5+ flash status response format now supported
+
 ## [1.3.9] - 2026-01-19
 
 ### Added
@@ -232,7 +238,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **metallb addon** - MetalLB load balancer
 - **ingress-nginx addon** - NGINX Ingress controller
 
-[Unreleased]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.8...HEAD
+[Unreleased]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.10...HEAD
+[1.3.10]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.9...v1.3.10
+[1.3.9]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.8...v1.3.9
 [1.3.8]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.7...v1.3.8
 [1.3.7]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.6...v1.3.7
 [1.3.6]: https://github.com/jfreed-dev/terraform-turingpi-modules/compare/v1.3.5...v1.3.6
