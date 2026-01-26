@@ -163,7 +163,8 @@ run_cmd() {
 # Get node slot from IP (last octet mapping)
 get_slot_from_ip() {
     local ip=$1
-    local last_octet=$(echo "$ip" | cut -d'.' -f4)
+    local last_octet
+    last_octet=$(echo "$ip" | cut -d'.' -f4)
     case $last_octet in
         73) echo 1 ;;
         74) echo 2 ;;
@@ -294,7 +295,7 @@ echo ""
 if [[ "$DRY_RUN" != "true" && "$SKIP_CONFIRM" != "true" ]]; then
     echo -e "${RED}This will PERMANENTLY DESTROY ALL DATA on these nodes!${NC}"
     echo ""
-    read -p "Type 'DESTROY' to confirm: " confirm
+    read -rp "Type 'DESTROY' to confirm: " confirm
     if [[ "$confirm" != "DESTROY" ]]; then
         log_warn "Aborted by user"
         exit 0
@@ -325,7 +326,7 @@ if [[ -f "$TALOSCONFIG" ]]; then
     # Don't reboot - we want to shutdown
     WIPE_CMD+=" --reboot=false"
 
-    run_cmd $WIPE_CMD || {
+    run_cmd "$WIPE_CMD" || {
         log_warn "Reset command returned non-zero (node may already be in maintenance mode)"
     }
 else
@@ -430,7 +431,7 @@ echo ""
 echo "=============================================="
 
 # Filter out empty elements from nodes_still_on
-nodes_still_on=(${nodes_still_on[@]})
+mapfile -t nodes_still_on < <(printf '%s\n' "${nodes_still_on[@]}" | grep -v '^$')
 
 if [[ ${#nodes_still_on[@]} -eq 0 || "$DRY_RUN" == "true" ]]; then
     log_info "Wipe workflow complete!"
