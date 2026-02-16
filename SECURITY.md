@@ -44,6 +44,15 @@ When using these Terraform modules:
 
 4. **Enable TLS verification** (default) - only use `insecure = true` in development environments
 
+5. **Test configurations** (`test/` directory) must use `sensitive` variables, not hardcoded passwords:
+   ```hcl
+   variable "bmc_password" {
+     type      = string
+     sensitive = true
+   }
+   ```
+   Supply values via `terraform.tfvars` (gitignored) or `TF_VAR_*` environment variables
+
 ## Supply Chain Security
 
 This repository implements security best practices:

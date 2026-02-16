@@ -132,6 +132,35 @@ The sections above the markers (Usage examples, etc.) are manually maintained.
 - Keep provider version constraints in `versions.tf`
 - Avoid hardcoded values; use variables with sensible defaults
 
+## Secrets in Test Configurations
+
+The `test/` directory is gitignored, but test configs must still follow secure patterns:
+
+- **Never hardcode passwords** in `.tf` files — use `variable` blocks with `sensitive = true`
+- **Supply values via `terraform.tfvars`** (also gitignored) or environment variables (`TF_VAR_*`)
+- **No default values** on sensitive variables — require explicit input
+
+Example pattern:
+
+```hcl
+variable "grafana_password" {
+  description = "Grafana admin password"
+  type        = string
+  sensitive   = true
+}
+
+module "monitoring" {
+  source             = "../../modules/addons/monitoring"
+  grafana_admin_password = var.grafana_password
+}
+```
+
+With a corresponding `terraform.tfvars`:
+
+```hcl
+grafana_password = "your-password-here"
+```
+
 ## Commit Messages
 
 Follow conventional commit style:

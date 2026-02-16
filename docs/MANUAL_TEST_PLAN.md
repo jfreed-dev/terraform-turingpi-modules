@@ -518,11 +518,17 @@ echo "Longhorn UI: http://localhost:8080"
 ```bash
 cat >> main.tf << 'EOF'
 
+variable "grafana_password" {
+  description = "Grafana admin password"
+  type        = string
+  sensitive   = true
+}
+
 module "monitoring" {
   source     = "../../modules/addons/monitoring"
   depends_on = [module.longhorn]
 
-  grafana_admin_password      = "admin123"
+  grafana_admin_password      = var.grafana_password
   grafana_persistence_enabled = true
   storage_class               = "longhorn"
 
