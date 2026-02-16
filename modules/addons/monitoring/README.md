@@ -6,6 +6,7 @@
 Terraform module to deploy the [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) for comprehensive Kubernetes monitoring.
 
 Includes:
+
 - **Prometheus** - Metrics collection and storage
 - **Grafana** - Visualization and dashboards
 - **Alertmanager** - Alert routing and management
@@ -57,6 +58,7 @@ On Talos Linux, Longhorn requires system extensions (`iscsi-tools`, `util-linux-
 The node-exporter component requires privileged access (hostNetwork, hostPID, hostPath). On clusters with Pod Security Admission enabled, this module automatically creates the namespace with privileged labels (default: `privileged_namespace = true`).
 
 **Platform defaults:**
+
 - **Talos Linux**: Requires `privileged_namespace = true` (PSA enforced)
 - **K3s/K8s**: Can use `privileged_namespace = false` (PSA not enforced by default)
 

@@ -98,6 +98,7 @@ module "metallb" {
 ```
 
 **Upgrade considerations:**
+
 - MetalLB upgrades are generally non-disruptive
 - CRD updates may be required for major versions
 - Test in staging environment first
@@ -113,6 +114,7 @@ module "ingress_nginx" {
 ```
 
 **Upgrade considerations:**
+
 - May cause brief service interruption during controller pod restart
 - Review ingress class changes between versions
 - Test TLS certificate handling after upgrade
@@ -128,6 +130,7 @@ module "longhorn" {
 ```
 
 **Upgrade considerations:**
+
 - **Always backup data before upgrading**
 - Check engine compatibility matrix
 - Upgrade manager first, then engines
@@ -145,6 +148,7 @@ module "monitoring" {
 ```
 
 **Upgrade considerations:**
+
 - Prometheus data retention during upgrade
 - Grafana dashboard compatibility
 - Alert rule migrations
@@ -160,6 +164,7 @@ module "cert_manager" {
 ```
 
 **Upgrade considerations:**
+
 - CRD updates may be required
 - Certificate renewal processes continue during upgrade
 - Test ACME challenges after upgrade
@@ -169,6 +174,7 @@ module "cert_manager" {
 ### v1.3.5
 
 **New features:**
+
 - Added `namespace` variable to all addon modules
 - Added `controller_resources` and `speaker_resources` to MetalLB
 - Added `controller_replicas` and resource configuration to ingress-nginx
@@ -177,6 +183,7 @@ module "cert_manager" {
 - New cert-manager addon module
 
 **Migration steps:**
+
 1. If you were using default namespaces, no changes required
 2. To use custom namespaces, add the `namespace` variable:
 
@@ -189,7 +196,7 @@ module "metallb" {
 }
 ```
 
-3. For monitoring module, ensure Grafana password is at least 8 characters:
+1. For monitoring module, ensure Grafana password is at least 8 characters:
 
 ```hcl
 module "monitoring" {
@@ -202,12 +209,14 @@ module "monitoring" {
 ### v1.3.4
 
 **Changes:**
+
 - Synchronized release with terraform-provider-turingpi v1.3.4
 - Provider now supports BMC firmware 2.3.4 API response format
 
 ### v1.3.3
 
 **Changes:**
+
 - Added CODE_OF_CONDUCT.md
 - Added docs/ARCHITECTURE.md
 - Added security workflow with Trivy scanning

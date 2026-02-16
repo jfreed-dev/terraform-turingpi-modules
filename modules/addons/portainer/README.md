@@ -75,6 +75,7 @@ Then connect from your Portainer instance using the agent URL.
 Portainer CE is free and open-source. You can run it anywhere:
 
 1. **Self-hosted Portainer CE:**
+
    ```bash
    docker run -d -p 9443:9443 --name portainer \
      --restart=always \
@@ -101,6 +102,7 @@ Portainer Business Edition includes additional features like RBAC, registry mana
    - Purchase: [portainer.io/pricing](https://www.portainer.io/pricing)
 
 2. **Deploy Portainer BE:**
+
    ```bash
    docker run -d -p 9443:9443 --name portainer \
      --restart=always \
@@ -122,6 +124,7 @@ Portainer Business Edition includes additional features like RBAC, registry mana
 ### Business Edition Features
 
 If you have a Business Edition license, you can take advantage of:
+
 - **Role-Based Access Control (RBAC)** - Fine-grained permissions
 - **Registry Management** - Manage multiple container registries
 - **GitOps Deployments** - Deploy from Git repositories

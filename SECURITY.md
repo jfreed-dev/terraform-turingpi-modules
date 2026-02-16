@@ -31,6 +31,7 @@ When using these Terraform modules:
 ### Credential Management
 
 1. **Use environment variables** for credentials instead of hardcoding in `.tf` files:
+
    ```bash
    export TURINGPI_USERNAME="root"
    export TURINGPI_PASSWORD="your-password"
@@ -42,16 +43,21 @@ When using these Terraform modules:
 
 3. **Use HTTPS** endpoints (the default) for BMC communication
 
-4. **Enable TLS verification** (default) - only use `insecure = true` in development environments
+4. **Enable TLS verification** (default) — only use
+   `insecure = true` in development environments
 
-5. **Test configurations** (`test/` directory) must use `sensitive` variables, not hardcoded passwords:
+5. **Test configurations** (`test/` directory) must use
+   `sensitive` variables, not hardcoded passwords:
+
    ```hcl
    variable "bmc_password" {
      type      = string
      sensitive = true
    }
    ```
-   Supply values via `terraform.tfvars` (gitignored) or `TF_VAR_*` environment variables
+
+   Supply values via `terraform.tfvars` (gitignored)
+   or `TF_VAR_*` environment variables
 
 ## Supply Chain Security
 

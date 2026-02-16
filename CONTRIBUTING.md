@@ -34,17 +34,20 @@ pip install pre-commit
 ### Setup
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/jfreed-dev/terraform-turingpi-modules.git
    cd terraform-turingpi-modules
    ```
 
 2. Install pre-commit hooks:
+
    ```bash
    pre-commit install
    ```
 
 3. Initialize TFLint plugins:
+
    ```bash
    tflint --init --config .tflint.hcl
    ```
@@ -96,6 +99,7 @@ terraform-docs --config .terraform-docs.yml modules/talos-cluster
 ### Required Status Checks
 
 All PRs must pass:
+
 - Terraform validation for all 8 modules
 - Security scan (Trivy)
 - Code owner review (@jfreed-dev)
@@ -136,8 +140,10 @@ The sections above the markers (Usage examples, etc.) are manually maintained.
 
 The `test/` directory is gitignored, but test configs must still follow secure patterns:
 
-- **Never hardcode passwords** in `.tf` files — use `variable` blocks with `sensitive = true`
-- **Supply values via `terraform.tfvars`** (also gitignored) or environment variables (`TF_VAR_*`)
+- **Never hardcode passwords** in `.tf` files — use
+  `variable` blocks with `sensitive = true`
+- **Supply values via `terraform.tfvars`** (also gitignored)
+  or environment variables (`TF_VAR_*`)
 - **No default values** on sensitive variables — require explicit input
 
 Example pattern:
@@ -164,6 +170,7 @@ grafana_password = "your-password-here"
 ## Commit Messages
 
 Follow conventional commit style:
+
 - `feat:` New features
 - `fix:` Bug fixes
 - `docs:` Documentation changes
@@ -178,15 +185,20 @@ Releases are created by tagging the main branch. All releases are GPG-signed.
 
 1. Update `CHANGELOG.md` with the new version
 2. Commit the changelog update:
+
    ```bash
    git add CHANGELOG.md
    git commit -S -m "docs: update changelog for v1.x.x"
    ```
+
 3. Create a signed tag:
+
    ```bash
    git tag -s v1.x.x -m "Release v1.x.x"
    ```
+
 4. Push to origin:
+
    ```bash
    git push origin main --tags
    ```
@@ -194,6 +206,7 @@ Releases are created by tagging the main branch. All releases are GPG-signed.
 ### Post-Release
 
 After pushing the tag:
+
 1. Verify the release appears on [GitHub Releases](https://github.com/jfreed-dev/terraform-turingpi-modules/releases)
 2. Confirm it syncs to [Terraform Registry](https://registry.terraform.io/modules/jfreed-dev/modules/turingpi)
 
@@ -210,6 +223,7 @@ The `main` branch has protection rules configured in GitHub. Recommended setting
 ### Required Status Checks
 
 Enable "Require status checks to pass before merging" with these checks:
+
 - `validate` (Terraform validation)
 - `trivy` (Security scanning)
 - `dependency-review` (For PRs)

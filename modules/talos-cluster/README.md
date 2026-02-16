@@ -84,7 +84,7 @@ module "cluster" {
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_cluster_endpoint"></a> [cluster\_endpoint](#input\_cluster\_endpoint) | Kubernetes API endpoint (https://IP:6443) | `string` | n/a | yes |
+| <a name="input_cluster_endpoint"></a> [cluster\_endpoint](#input\_cluster\_endpoint) | Kubernetes API endpoint (<https://IP:6443>) | `string` | n/a | yes |
 | <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | Name of the Kubernetes cluster | `string` | n/a | yes |
 | <a name="input_control_plane"></a> [control\_plane](#input\_control\_plane) | Control plane node configurations | <pre>list(object({<br/>    host     = string<br/>    hostname = optional(string)<br/>  }))</pre> | n/a | yes |
 | <a name="input_controlplane_patches"></a> [controlplane\_patches](#input\_controlplane\_patches) | Config patches for control plane nodes (YAML strings) | `list(string)` | `[]` | no |
@@ -187,6 +187,7 @@ curl -LO "https://factory.talos.dev/image/613e1592b2da41ae5e265e8789429f22e121aa
 | iscsi-tools + util-linux-tools | `613e1592b2da41ae5e265e8789429f22e121aab91cb4deb6bc3c0b6262961245` |
 
 Use these IDs to download images directly:
+
 ```
 https://factory.talos.dev/image/{SCHEMATIC_ID}/{TALOS_VERSION}/metal-arm64.raw.xz
 ```
@@ -226,6 +227,7 @@ Use the included wipe script to cleanly wipe all drives, shutdown nodes, and ver
 ```
 
 The script will:
+
 1. Wipe STATE and EPHEMERAL partitions
 2. Optionally wipe user disks (NVMe)
 3. Shutdown all nodes

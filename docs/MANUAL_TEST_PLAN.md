@@ -226,6 +226,7 @@ talosctl -n $CP_IP health
 ```
 
 **Expected**:
+
 - 4 nodes Ready (1 control-plane, 3 workers)
 - All kube-system pods Running
 - talosctl health shows all checks passing
@@ -365,6 +366,7 @@ ssh root@$CP_IP "df -h /var/lib/longhorn"
 ```
 
 **Expected**:
+
 - 4 nodes Ready
 - All kube-system pods Running
 - NVMe mounted at /var/lib/longhorn
@@ -427,6 +429,7 @@ kubectl get l2advertisement -n metallb-system
 ```
 
 **Expected**:
+
 - controller and speaker pods Running
 - IPAddressPool "default-pool" exists
 - L2Advertisement configured
@@ -466,6 +469,7 @@ curl -sk https://$INGRESS_IP 2>&1 | head -5
 ```
 
 **Expected**:
+
 - ingress-nginx-controller pod Running
 - Service has EXTERNAL-IP = $INGRESS_IP
 - curl returns nginx default backend (404)
@@ -508,6 +512,7 @@ echo "Longhorn UI: http://localhost:8080"
 ```
 
 **Expected**:
+
 - All longhorn pods Running
 - StorageClass "longhorn" is default
 - StorageClass "longhorn-nvme" exists
@@ -559,6 +564,7 @@ curl -s http://grafana.local/api/health | jq
 ```
 
 **Expected**:
+
 - Prometheus, Grafana, Alertmanager pods Running
 - PVCs bound to Longhorn volumes
 - Grafana health check returns OK
@@ -599,6 +605,7 @@ nc -zv $PORTAINER_IP 9001
 ```
 
 **Expected**:
+
 - portainer-agent pod Running
 - Service has EXTERNAL-IP = $PORTAINER_IP
 - Port 9001 is open
@@ -623,7 +630,7 @@ nc -zv $PORTAINER_IP 9001
 | MetalLB | Create LoadBalancer svc | Gets IP from pool |
 | Ingress | curl https://$INGRESS_IP | Returns response |
 | Longhorn | Create PVC with storageClass=longhorn | PVC Bound |
-| Grafana | Login to http://grafana.local | Dashboard loads |
+| Grafana | Login to <http://grafana.local> | Dashboard loads |
 | Portainer | Connect agent from Portainer CE | Cluster visible |
 
 ### Storage Test

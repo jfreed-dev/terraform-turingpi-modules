@@ -98,6 +98,7 @@ output "download_command" {
 ```
 
 Then download:
+
 ```bash
 curl -L "https://factory.talos.dev/image/613e1592.../v1.9.2/metal-arm64.raw.xz" \
   | xz -d > talos-longhorn-arm64.raw
@@ -246,6 +247,7 @@ Kubernetes nodes require stable IP addresses. We recommend using **DHCP reservat
 **Recommended Approach: DHCP Reservations**
 
 Configure your network's DHCP server to assign fixed IPs to each node's MAC address. Check your:
+
 - Home router admin interface
 - Dedicated DHCP server (pfSense, OPNsense, Pi-hole, etc.)
 - Enterprise DHCP server
@@ -308,6 +310,7 @@ Create an autoconfig file for automated first-boot setup:
 ```
 
 This creates `/boot/armbian_first_run.txt` with:
+
 - Root password preset
 - Timezone configuration
 - SSH public key for passwordless access
@@ -639,6 +642,7 @@ flowchart TD
 ### Talos Cluster Destruction
 
 **Option 1: Quick Destroy (Keep OS)**
+
 ```bash
 # Remove Kubernetes resources only
 terraform destroy
@@ -648,6 +652,7 @@ talosctl --talosconfig ./talosconfig cluster show
 ```
 
 **Option 2: Full Wipe (Prepare for Re-imaging)**
+
 ```bash
 # Step 1: Terraform destroy (optional but recommended)
 terraform destroy
@@ -672,6 +677,7 @@ terraform destroy
 ### K3s Cluster Destruction
 
 **Option 1: Quick Destroy (Keep OS)**
+
 ```bash
 # Remove Kubernetes resources only
 terraform destroy
@@ -683,6 +689,7 @@ done
 ```
 
 **Option 2: Full Wipe (Prepare for Re-imaging)**
+
 ```bash
 # Step 1: Terraform destroy (optional but recommended)
 terraform destroy
@@ -729,6 +736,7 @@ export KUBECONFIG="./kubeconfig"
 ### Common Commands
 
 **Talos Cluster:**
+
 ```bash
 # Check cluster health
 talosctl --talosconfig ./talosconfig health
@@ -744,6 +752,7 @@ talosctl --talosconfig ./talosconfig upgrade --image factory.talos.dev/...
 ```
 
 **K3s Cluster:**
+
 ```bash
 # Check node status
 kubectl get nodes -o wide
@@ -759,6 +768,7 @@ ssh root@10.10.88.74 "curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.32.0
 ```
 
 **Addon Verification:**
+
 ```bash
 # MetalLB
 kubectl get ipaddresspools -n metallb-system

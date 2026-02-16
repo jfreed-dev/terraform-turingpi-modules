@@ -199,6 +199,7 @@ module "k3s" {
 ## K3s Configuration
 
 By default, this module:
+
 - **Disables Traefik** - Use ingress-nginx addon instead
 - **Disables ServiceLB** - Use MetalLB addon instead
 - **Installs open-iscsi** - Required for Longhorn
@@ -280,21 +281,25 @@ module "portainer" {
 ## Troubleshooting
 
 ### SSH Connection Failed
+
 - Verify node is accessible: `ssh root@<ip>`
 - Check SSH key permissions: `chmod 600 ~/.ssh/id_rsa`
 - Ensure node has completed boot
 
 ### K3s Installation Timeout
+
 - Check node internet connectivity
 - Verify DNS resolution on nodes
 - Review logs: `journalctl -u k3s`
 
 ### Worker Not Joining
+
 - Verify control plane is ready
 - Check network connectivity between nodes
 - Review agent logs: `journalctl -u k3s-agent`
 
 ### NVMe Not Detected
+
 - Verify device exists: `lsblk`
 - Check NVMe is properly seated
 - Device may be `/dev/nvme0n1` or similar

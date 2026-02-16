@@ -95,12 +95,14 @@ PRESET_TIMEZONE="${TIMEZONE}"
 EOF
 
     if [[ -n "$HOSTNAME" ]]; then
-        echo "" >> "$AUTOCONFIG_FILE"
-        echo "# Hostname (set after first boot via hostnamectl)" >> "$AUTOCONFIG_FILE"
-        echo "# PRESET_HOSTNAME=\"${HOSTNAME}\"" >> "$AUTOCONFIG_FILE"
-        echo "" >> "$AUTOCONFIG_FILE"
-        echo "# Note: Hostname is best set via SSH after boot:" >> "$AUTOCONFIG_FILE"
-        echo "#   hostnamectl set-hostname ${HOSTNAME}" >> "$AUTOCONFIG_FILE"
+        {
+            echo ""
+            echo "# Hostname (set after first boot via hostnamectl)"
+            echo "# PRESET_HOSTNAME=\"${HOSTNAME}\""
+            echo ""
+            echo "# Note: Hostname is best set via SSH after boot:"
+            echo "#   hostnamectl set-hostname ${HOSTNAME}"
+        } >> "$AUTOCONFIG_FILE"
     fi
 
     # Add SSH key if provided

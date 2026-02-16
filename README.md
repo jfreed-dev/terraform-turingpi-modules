@@ -167,6 +167,7 @@ Helper scripts for cluster lifecycle management are provided in the `scripts/` d
 | [`find-armbian-image.sh`](./scripts/find-armbian-image.sh) | Find Armbian images, generate autoconfig for first-boot |
 
 **Wipe scripts** (`talos-wipe.sh`, `k3s-wipe.sh`) support:
+
 - `--dry-run` mode for safe testing
 - Environment variables (`TURINGPI_ENDPOINT`, `TURINGPI_USERNAME`, `TURINGPI_PASSWORD`)
 - Credential files in `~/.secrets/`
@@ -245,6 +246,7 @@ module "monitoring" {
 ## Verified Configurations
 
 Tested and verified on v1.3.9:
+
 - K3s v1.31.4+k3s1 on Armbian 26.2.0-trunk.151 (trixie)
 - BMC firmware v2.3.4
 - MetalLB L2 mode with IP pool assignment

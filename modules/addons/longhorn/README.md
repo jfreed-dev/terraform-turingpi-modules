@@ -61,6 +61,7 @@ curl -LO "https://factory.talos.dev/image/{SCHEMATIC_ID}/{VERSION}/metal-arm64.r
 ```
 
 **Pre-built Schematic ID** (iscsi-tools + util-linux-tools):
+
 ```
 613e1592b2da41ae5e265e8789429f22e121aab91cb4deb6bc3c0b6262961245
 ```
@@ -70,12 +71,14 @@ curl -LO "https://factory.talos.dev/image/{SCHEMATIC_ID}/{VERSION}/metal-arm64.r
 Most standard Kubernetes distributions include the required tools. However, some base images (like Armbian) may need packages installed:
 
 **Debian/Ubuntu/Armbian:**
+
 ```bash
 apt-get update && apt-get install -y open-iscsi nfs-common
 systemctl enable --now iscsid
 ```
 
 **RHEL/CentOS/Rocky:**
+
 ```bash
 yum install -y iscsi-initiator-utils nfs-utils
 systemctl enable --now iscsid
@@ -92,6 +95,7 @@ Longhorn reserves approximately 30% of disk space by default. On nodes with limi
 | 128GB     | ~38.4GB         | ~90GB       |
 
 **Tip:** For eMMC-constrained nodes, consider:
+
 - Reducing `prometheus_storage_size` to 10Gi or less
 - Using `default_replica_count = 1` for non-critical workloads
 - Adding NVMe storage and using disk selectors
@@ -171,6 +175,7 @@ module "longhorn" {
 ```
 
 After deployment, tag your NVMe disks in Longhorn UI or via API:
+
 - Add tag `nvme` to NVMe disk nodes
 
 ## License
